@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+
+  <div class="tab-container">
+    <button class="tab-btn active" data-target="tab-timer">タイマー</button>
+    <button class="tab-btn" data-target="tab-info">情報</button>
+    <button class="tab-btn" data-target="tab-control">Conパネ</button>
+    <button class="tab-btn" data-target="tab-style">共通設定</button>
+  </div>
+
+  <div id="tab-timer" class="content-area active">
+    <h2>タイマー設定</h2>
+
+    <div class="control-group">
+      <label>プリセットボタン (分)</label>
+      <div class="preset-row">
+        <input type="number" id="pre1" class="preset-input" placeholder="10">
+        <input type="number" id="pre2" class="preset-input" placeholder="20">
+        <input type="number" id="pre3" class="preset-input" placeholder="30">
+        <input type="number" id="pre4" class="preset-input" placeholder="--">
+      </div>
+      <div class="note">※最大4つ。空欄にするとボタンが減ります。</div>
+    </div>
+
+    <div class="separator"></div>
+
+    <h2>表示設定</h2>
+    <div class="toggle-row">
+      <span class="toggle-label">表示モード</span>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="timerMode" value="always" checked> 常に表示
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="timerMode" value="auto"> 自動
+        </label>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">完了時に通知を送る</span>
+      <input type="checkbox" id="timerNotify">
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">ウィンドウ枠を表示</span>
+      <input type="checkbox" id="timerFrame" checked>
+    </div>
+  </div>
+
+  <div id="tab-info" class="content-area">
+    <h2>レイアウト設定</h2>
+    <div class="control-group">
+      <label>カードパレット</label>
+
+      <!-- カードパレット -->
+      <div class="layout-palette" id="layout-palette">
+        <!-- JSで生成 -->
+      </div>
+
+      <label style="display:flex; justify-content:space-between; align-items:center;">
+        <span>配置エリア（情報パネルプレビュー）</span>
+        <button id="btn-snap-toggle" class="chk-btn active" title="スナップ有効/無効"><i
+            class="fa-solid fa-magnet"></i></button>
+      </label>
+
+      <!-- ドロップゾーン（情報パネルに見立てる） -->
+      <div id="layout-dropzone" class="layout-dropzone">
+        <div class="dropzone-placeholder">カードをここにドラッグして配置</div>
+        <!-- カードが動的に追加される -->
+      </div>
+
+      <div class="note">
+        ※カードをドラッグして配置。カード間の境界をドラッグで幅調整。
+      </div>
+    </div>
+
+
+
+    <div class="separator"></div>
+
+    <h2>テキスト情報入力</h2>
+    <div class="control-group">
+      <label>
+        <span>自由記述 (上段 / Free Text)</span>
+      </label>
+      <div class="toggle-row" style="margin-bottom: 4px; padding: 4px;">
+        <span class="toggle-label" style="font-size:11px;">スクロール:</span>
+        <div class="radio-group">
+          <label class="radio-label" style="font-size:11px;">
+            <input type="radio" name="freeTextScrollMode" value="normal" checked> 環状シフト
+          </label>
+          <label class="radio-label" style="font-size:11px;" title="文字列終端に間隔付き">
+            <input type="radio" name="freeTextScrollMode" value="circular"> 無限スクロール
+          </label>
+        </div>
+      </div>
+      <textarea id="infoFreeText" class="area-input" rows="2" placeholder="例: ラスダン沼り中 / S勝利狙い"></textarea>
+    </div>
+
+    <div class="separator"></div>
+
+    <h2>艦娘リスト設定</h2>
+    <div class="control-group">
+      <label>タイトル</label>
+      <input type="text" id="infoCustomTitle" class="area-input" placeholder="任意のタイトル">
+    </div>
+    <div class="control-group">
+      <label>リスト (タグ表示)</label>
+      <textarea id="infoCustomList" class="area-input" rows="5" placeholder="項目1, 項目2:+0/5, 項目3:-10/2"></textarea>
+      <div class="note">
+        ※カンマ区切り。<br>
+        ・通常: <span class="code">艦名</span> (クリックで削除)<br>
+        ・増: <span class="code">艦名:+値/上限</span> (上限で削除)<br>
+        ・減: <span class="code">艦名:-値/下限</span> (下限で削除, 省略時0)
+      </div>
+    </div>
+
+    <div class="separator"></div>
+    <h2>BGM設定</h2>
+    <div class="control-group">
+      <label>BGMヘッダ (絵文字可)</label>
+      <input type="text" id="bgmHeader" class="area-input" placeholder="♪" value="♪">
+      <div class="toggle-row" style="margin-top: 4px; padding: 4px;">
+        <span class="toggle-label" style="font-size:11px;">スクロール:</span>
+        <div class="radio-group">
+          <label class="radio-label" style="font-size:11px;">
+            <input type="radio" name="bgmScrollMode" value="normal" checked> 環状シフト
+          </label>
+          <label class="radio-label" style="font-size:11px;" title="文字列終端に間隔付き">
+            <input type="radio" name="bgmScrollMode" value="circular"> 無限スクロール
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="separator"></div>
+    <h2>情報ウィンドウ設定</h2>
+    <div class="toggle-row">
+      <span class="toggle-label">ウィンドウを表示する</span>
+      <input type="checkbox" id="areaVisible" checked>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">ウィンドウ枠を表示</span>
+      <input type="checkbox" id="areaFrame" checked>
+    </div>
+  </div>
+
+  </div>
+
+  <div id="tab-control" class="content-area">
+    <h2>コントロールパネル設定</h2>
+    <div class="toggle-row">
+      <span class="toggle-label">パネルを表示する</span>
+      <input type="checkbox" id="controlVisible" checked>
+    </div>
+  </div>
+
+  <div id="tab-style" class="content-area">
+    <h2>全体デザイン設定</h2>
+    <div class="control-group">
+      <label>ウィンドウ拡大率 <span id="val-scale" class="val-disp">1.0</span></label>
+      <input type="range" id="scale" min="0.1" max="2.0" step="0.1" value="1.0">
+    </div>
+    <div class="control-group">
+      <label>基本文字サイズ <span id="val-fsize" class="val-disp">36px</span></label>
+      <input type="range" id="fontSize" min="20" max="60" value="36">
+    </div>
+
+    <div class="control-group">
+      <label>背景色 / 不透明度</label>
+      <div class="row">
+        <input type="color" id="bgColor" value="#0a192d">
+        <input type="range" id="bgOpacity" min="0" max="1" step="0.05" value="0.65" class="flex-1">
+      </div>
+    </div>
+    <div class="control-group">
+      <label>ぼかし / 影サイズ</label>
+      <div class="row">
+        <span class="text-xs">ぼかし</span>
+        <input type="range" id="blur" min="0" max="20" value="10" class="flex-1">
+      </div>
+      <div class="row mt-5">
+        <span class="text-xs">影の濃さ</span>
+        <input type="range" id="shadowSize" min="0" max="100" value="32" class="flex-1">
+      </div>
+    </div>
+    <div class="control-group">
+      <label>スクロール速度 <input type="number" id="val-scrollSpeed" class="val-input-num" min="1" max="100"
+          value="50"></label>
+      <input type="range" id="scrollSpeed" min="1" max="100" value="50">
+    </div>
+    <div class="separator"></div>
+    <div class="control-group">
+      <label>ウィンドウ位置リセット</label>
+      <button id="centerBtn" class="main-btn btn-center-reset">全ウィンドウを画面中央に集める</button>
+      <div class="note">※画面外に見失った場合などに使用してください</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button id="saveBtn" class="main-btn">設定を保存して反映</button>
+    <button id="resetBtn" class="main-btn reset">デフォルトに戻す</button>
+  </div>
+
+  <script src="js/kcUtils.js"></script>
+  <script src="js/popup_layout_editor.js"></script>
+  <script src="js/popup.js"></script>
+</body>
+
+</html>

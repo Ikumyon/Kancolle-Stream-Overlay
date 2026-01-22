@@ -1,0 +1,935 @@
+/* --- CSS変数 (Modern Glass Design) --- */
+:root {
+  --kc-scale: 1.0;
+  --kc-font-size: 36px;
+
+  /* レイアウト共通変数 */
+  --card-padding: 0.3em;
+  /* フォントサイズ基準の余白 */
+  --card-height: calc(1em + var(--card-padding) * 2);
+  /* 文字高さ(1em) + 上下余白 */
+
+  /* メインカラー定義 */
+  --glass-bg: rgba(16, 24, 40, 0.75);
+  /* 深いブルーグレー */
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-border-highlight: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --glass-blur: 16px;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-accent: #38bdf8;
+  /* Sky-400 */
+  --text-timer: #ffffff;
+
+  --accent-blue: rgba(56, 189, 248, 0.2);
+  --accent-red: rgba(248, 113, 113, 0.2);
+
+  /* ユーザー設定値用変数 (jsで上書きされる値) */
+  --kc-bg-rgba: var(--glass-bg);
+  --kc-blur: var(--glass-blur);
+  --kc-shadow-rgba: rgba(0, 0, 0, 0.5);
+  /* 互換性のため維持 */
+  --kc-shadow-size: 32px;
+}
+
+/* --- すりガラスウィンドウ (共通) --- */
+.kc-display-window {
+  position: fixed;
+  background: var(--kc-bg-rgba);
+  backdrop-filter: blur(var(--kc-blur));
+  -webkit-backdrop-filter: blur(var(--kc-blur));
+
+  border: 1px solid var(--glass-border);
+  border-top: 1px solid var(--glass-border-highlight);
+  /* 上部を明るくして光の反射を表現 */
+  border-radius: 16px;
+  box-shadow: 0 4px var(--kc-shadow-size) -4px rgba(0, 0, 0, 0.6);
+
+  transform: scale(var(--kc-scale));
+  transform-origin: top left;
+
+  color: var(--text-primary);
+  font-family: "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
+  z-index: 2147483647;
+
+  overflow: hidden;
+
+  user-select: none;
+  resize: none;
+  transition: transform 0.1s, background 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+/* 枠無効(No Frame)時のスタイル */
+.kc-display-window.kc-no-frame {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-top: 1px solid transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.kc-display-window.kc-no-frame .kc-header-transparent span {
+  display: none;
+}
+
+.kc-display-window.kc-no-frame:hover {
+  border: 1px dashed rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+
+/* ドラッグ領域 */
+.kc-header-transparent {
+  height: 18px;
+  width: 100%;
+  cursor: move;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kc-header-transparent span {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 2px;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.kc-header-transparent:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.kc-header-transparent:hover span {
+  color: var(--text-primary);
+}
+
+/* --- タイマー --- */
+#kc-win-timer {
+  width: auto;
+  min-width: 100px;
+  min-height: 80px;
+  text-align: center;
+  padding-bottom: 12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  overflow: visible !important;
+}
+
+/* カウントダウン表示 */
+.kc-timer-val {
+  font-size: var(--kc-font-size);
+  color: var(--text-timer);
+  font-family: "Geist Mono", "Roboto Mono", "Consolas", monospace;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.kc-timer-prefix {
+  display: none;
+  /* シンプル化のため非表示 */
+}
+
+.kc-end-time {
+  font-size: calc(var(--kc-font-size) * 0.35);
+  /* 相対指定 */
+  margin-top: 6px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.kc-timer-status {
+  font-size: calc(var(--kc-font-size) * 0.4);
+  /* 相対指定 */
+  color: #fbbf24;
+  /* Amber-400 */
+  font-weight: bold;
+  margin-bottom: 4px;
+  display: none;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* --- 情報ウィンドウ --- */
+#kc-win-area {
+  min-width: 250px;
+  width: 580px;
+  overflow: visible !important;
+
+  /* ウィンドウ自体は透明にし、配置のみ担当 */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  pointer-events: auto;
+  resize: none !important;
+}
+
+/* リサイズハンドル */
+.kc-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  cursor: ew-resize;
+  z-index: 100;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.kc-resize-handle:hover {
+  background: rgba(56, 189, 248, 0.3);
+  border-radius: 4px;
+}
+
+/* タイマー用リサイズハンドル (右下) */
+.kc-resize-handle-se {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  z-index: 101;
+  background: transparent;
+  transition: background 0.2s;
+  border-bottom-right-radius: 12px;
+  /* パネルの角丸に合わせる */
+}
+
+.kc-resize-handle-se:hover {
+  background: rgba(56, 189, 248, 0.3);
+}
+
+/* ホバー時にリサイズ領域がわかるように薄い枠を出す（オプション） */
+/* #kc-win-area:hover {
+  border: 1px dotted rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
+} */
+
+/* 実際の表示部分（リージョン） */
+.kc-region-body {
+  width: 100%;
+  min-width: 250px;
+  max-width: 100%;
+
+  background: var(--kc-bg-rgba);
+  backdrop-filter: blur(var(--kc-blur));
+  -webkit-backdrop-filter: blur(var(--kc-blur));
+
+  border: 1px solid var(--glass-border);
+  border-top: 1px solid var(--glass-border-highlight);
+  border-radius: 12px;
+  box-shadow: 0 8px var(--kc-shadow-size) 0 rgba(0, 0, 0, 0.3);
+
+  color: var(--text-primary);
+  padding: 0 8px 8px 8px;
+
+  /* アニメーション */
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.kc-region-body:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* kc-no-frame が親(#kc-win-area)についた場合 */
+#kc-win-area.kc-no-frame .kc-region-body {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+#kc-win-area.kc-no-frame:hover {
+  border: 1px dashed rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+
+.kc-area-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 上段 */
+.kc-row-upper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+/* バッジ - Modern Tag Style */
+.kc-card-map-content {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.kc-badge {
+  /* 高さ調整: 他のカードと高さを揃える */
+  box-sizing: border-box;
+  /* コンテンツボックス計算を統一 */
+  height: var(--card-height);
+  display: flex;
+  /* inline-flexからflexへ変更して揃える */
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--card-padding);
+  /* 上下のパディングはheightで制御、横のみ指定 */
+
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: var(--kc-font-size);
+  line-height: 1;
+  /* 行送りの影響を排除 */
+
+  /* Glass effect for badges */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.kc-bg-map {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(37, 99, 235, 0.3));
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #e0f2fe;
+}
+
+.kc-bg-status {
+  background: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}
+
+.kc-diff-kou {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.4), rgba(153, 27, 27, 0.4));
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #fecaca;
+}
+
+.kc-diff-otsu {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.4), rgba(154, 52, 18, 0.4));
+  border-color: rgba(253, 186, 116, 0.4);
+  color: #fed7aa;
+}
+
+.kc-diff-hei {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.4), rgba(21, 128, 61, 0.4));
+  border-color: rgba(74, 222, 128, 0.4);
+  color: #bbf7d0;
+}
+
+.kc-diff-tei {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.4), rgba(30, 64, 185, 0.4));
+  border-color: rgba(96, 165, 250, 0.4);
+  color: #bfdbfe;
+}
+
+
+/* 自由記述コンテナ */
+.kc-card-text-content {
+  font-size: var(--kc-font-size);
+  color: var(--text-primary);
+
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+
+  /* 高さ調整 */
+  box-sizing: border-box;
+  /* コンテンツボックス計算を統一 */
+  height: var(--card-height);
+  padding: 0 var(--card-padding);
+  /* 上下パディング除去してheightとflexで制御 */
+  overflow: hidden;
+  white-space: nowrap;
+
+  display: flex;
+  align-items: center;
+  /* 垂直中央揃え */
+  line-height: 1;
+  /* 高さを合わせるために1に統一 */
+}
+
+/* スクロール時 */
+.kc-text-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: kc-marquee 15s linear infinite;
+}
+
+.kc-card-list-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  overflow: hidden;
+  min-height: 24px;
+}
+
+.kc-info-title {
+  font-size: var(--kc-font-size);
+}
+
+.kc-tag {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+
+  padding: 0 var(--card-padding);
+  border-radius: 4px;
+  font-size: var(--kc-font-size);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  /* 高さ合わせ */
+  height: var(--card-height);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.kc-tag:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.kc-tag-delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(248, 113, 113, 0.4);
+  color: #fecaca;
+  text-decoration: line-through;
+}
+
+.kc-tag-counter:hover {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #e0f2fe;
+}
+
+
+/* --- コントロールパネル --- */
+#kc-win-control {
+  position: fixed;
+  background: var(--kc-bg-rgba);
+  backdrop-filter: blur(var(--kc-blur));
+  -webkit-backdrop-filter: blur(var(--kc-blur));
+
+  border: 1px solid var(--glass-border);
+  border-top: 1px solid var(--glass-border-highlight);
+  border-radius: 12px;
+  box-shadow: 0 8px var(--kc-shadow-size) 0 rgba(0, 0, 0, 0.4);
+
+  transform: scale(var(--kc-scale));
+  transform-origin: top left;
+  transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
+
+  color: #fff;
+  z-index: 2147483647;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 13px;
+  width: 580px;
+  resize: none;
+}
+
+.kc-ctrl-header {
+  height: 18px;
+  width: 100%;
+  cursor: move;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.kc-ctrl-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.kc-ctrl-header span {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 2px;
+  pointer-events: none;
+}
+
+.kc-ctrl-header:hover span {
+  color: var(--text-primary);
+}
+
+.kc-ctrl-body {
+  padding: 4px;
+  display: flex;
+  gap: 2px;
+}
+
+.kc-section {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.kc-label-side {
+  width: 70px;
+  text-align: left;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.kc-content-side {
+  flex: 1;
+  padding-left: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kc-mini-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  width: 40px;
+}
+
+.kc-btn-row,
+.kc-input-row {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.kc-cond-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+
+/* Utils for replacement of inline styles in kcView.js */
+.kc-ctrl-body-start {
+  align-items: flex-start;
+}
+
+.kc-section-timer {
+  flex: 0 0 280px;
+}
+
+.kc-section-map {
+  flex: 1;
+  position: relative;
+}
+
+.kc-timer-input-manual {
+  text-align: center;
+  flex: 1;
+  min-width: 0;
+  border-radius: 4px;
+}
+
+.kc-timer-btn {
+  flex: 1;
+}
+
+.kc-timer-btn-stop {
+  flex: 1;
+}
+
+.kc-label-cond {
+  width: 38px;
+}
+
+.kc-input-cond {
+  width: 38px;
+  border-radius: 4px;
+}
+
+.kc-arrow-cond {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.kc-btn-cond-set {
+  margin-left: 4px;
+  width: 50px;
+}
+
+.kc-label-map {
+  width: 40px;
+}
+
+/* Control Panel Buttons & Inputs */
+.kc-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  /* White glass */
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  padding: 4px 0;
+  font-size: 12px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.kc-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.kc-btn-red {
+  background: rgba(220, 38, 38, 0.3);
+  /* Red glass */
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.kc-btn-red:hover {
+  background: rgba(220, 38, 38, 0.5);
+  color: #fff;
+}
+
+.kc-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.kc-input:focus {
+  border-color: var(--text-accent);
+  outline: none;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.kc-setting-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.kc-check-label {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.kc-check-label:hover {
+  color: var(--text-primary);
+}
+
+.kc-input-short {
+  width: 32px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.kc-input-short:focus {
+  border-color: var(--text-accent);
+  outline: none;
+}
+
+
+/* テンキー / Numpad - Modern */
+.kc-numpad {
+  position: absolute;
+  width: 140px;
+  background: rgba(16, 24, 40, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: none;
+}
+
+.kc-numpad-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.kc-numpad-row-bottom {
+  display: flex;
+  gap: 6px;
+}
+
+.kc-num-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 15px;
+  font-weight: 500;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.1s;
+}
+
+.kc-num-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.kc-num-btn:active {
+  background: var(--text-accent);
+  color: #000;
+  transform: translateY(1px);
+}
+
+.kc-icon-btn {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.kc-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+
+.kc-btn-group {
+  display: flex;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.kc-btn-s {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 2px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.kc-btn-s:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.kc-btn-s.active {
+  background: rgba(56, 189, 248, 0.2);
+  /* Sky Blue tint */
+  color: var(--text-accent);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
+}
+
+/* --- マーキー(文字スクロール)アニメーション --- */
+@keyframes kc-marquee {
+  100% {
+    transform: translate(-100%, 0);
+  }
+}
+
+/* 無限スクロール (Circular) */
+@keyframes kc-marquee-infinite {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.kc-marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.kc-marquee-inner {
+  display: inline-block;
+  padding-left: 100%;
+  animation: kc-marquee 15s linear infinite;
+}
+
+/* Infinite Scroll Wrapper */
+.kc-scroll-infinite-wrap {
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+}
+
+.kc-scroll-infinite-inner {
+  display: flex;
+  white-space: nowrap;
+  animation: kc-marquee-infinite linear infinite;
+  /* DurationはJSで文字長さに応じて設定 */
+}
+
+.kc-scroll-item {
+  padding-right: 2em;
+  flex-shrink: 0;
+}
+
+/* --- Refactoring Utility Classes --- */
+.kc-mb-1 {
+  margin-bottom: 4px;
+}
+
+.kc-text-gray {
+  color: var(--text-secondary);
+}
+
+.kc-card-list-items {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+/* --- BGM情報 --- */
+.kc-card-bgm-content {
+  /* 親のフォントサイズにあわせて高さを確保 */
+  font-size: var(--kc-font-size);
+  color: var(--text-primary);
+
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+
+  /* 高さ調整 */
+  box-sizing: border-box;
+  /* コンテンツボックス計算を統一 */
+  height: var(--card-height);
+  padding: 0 var(--card-padding);
+
+  /* margin-bottom 削除 (gapで制御) */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.kc-bgm-label {
+  /* 中身だけフォントサイズを縮小 */
+  font-size: 0.75em;
+  color: var(--text-accent);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.kc-bgm-text {
+  /* 中身だけフォントサイズを縮小 */
+  font-size: 0.75em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  position: relative;
+}
+
+/* スクロールアニメーション用 */
+.kc-bgm-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: kc-marquee 20s linear infinite;
+}
+
+.val-input-num {
+  width: 48px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-align: center;
+  font-size: 13px;
+  margin-left: 8px;
+  border-radius: 4px;
+}
+
+/* --- 戦果情報 --- */
+.kc-card-senka-content {
+  /* 親のフォントサイズにあわせて高さを確保 */
+  font-size: var(--kc-font-size);
+  color: var(--text-primary);
+
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+
+  /* 高さ調整 */
+  box-sizing: border-box;
+  /* コンテンツボックス計算を統一 */
+  height: var(--card-height);
+  padding: 0 var(--card-padding);
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.kc-senka-label {
+  /* 中身だけフォントサイズを縮小 */
+  font-size: var(--kc-font-size);
+  color: var(--text-accent);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.kc-senka-text {
+  /* 中身だけフォントサイズを縮小 */
+  font-size: var(--kc-font-size);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  position: relative;
+}
