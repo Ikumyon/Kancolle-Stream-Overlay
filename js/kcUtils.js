@@ -180,7 +180,9 @@ const DEFAULT_SETTINGS = {
   timerMode: 'always',
   timerNotify: false,
   timerFrame: true,
+  timerClickThrough: false,
   controlVisible: true,
+  numpadEnabled: true,
   areaVisible: true, areaFrame: true,
   layoutConfig: { version: 2, rows: [{ columns: [{ items: [], flex: 1 }] }] }, // デフォルト: 空の列を持つ行1つ
   bgmHeader: "♪",

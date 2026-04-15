@@ -98,7 +98,6 @@ function saveAndSend() {
   const settings = {
     scale: parseFloat(document.getElementById('scale').value),
     fontSize: parseInt(document.getElementById('fontSize').value),
-    fontSize: parseInt(document.getElementById('fontSize').value),
     // textColor: removed
     bgColor: document.getElementById('bgColor').value,
     bgOpacity: parseFloat(document.getElementById('bgOpacity').value),
@@ -109,10 +108,15 @@ function saveAndSend() {
 
     scrollSpeed: parseInt(document.getElementById('scrollSpeed').value),
 
+    portSupplyInterval: parseInt(document.getElementById('portSupplyInterval').value) || 15,
+    portSupplyAmount: parseInt(document.getElementById('portSupplyAmount').value) || 2,
+
     timerMode: timerModeVal,
     timerNotify: document.getElementById('timerNotify').checked,
     timerFrame: document.getElementById('timerFrame').checked,
+    timerClickThrough: document.querySelector('input[name="timerClickThrough"]:checked').value === 'true',
     controlVisible: document.getElementById('controlVisible').checked,
+    numpadEnabled: document.getElementById('numpadEnabled').checked,
     areaVisible: document.getElementById('areaVisible').checked,
     areaFrame: document.getElementById('areaFrame').checked,
 
@@ -123,7 +127,10 @@ function saveAndSend() {
     customTitle: document.getElementById('infoCustomTitle').value,
     customList: document.getElementById('infoCustomList').value,
     bgmHeader: document.getElementById('bgmHeader').value,
+    customList: document.getElementById('infoCustomList').value,
+    bgmHeader: document.getElementById('bgmHeader').value,
     bgmScrollMode: document.querySelector('input[name="bgmScrollMode"]:checked').value,
+    bgmEnabled: document.getElementById('kc-chk-bgm').checked,
 
     timerPresets: presets
   };
@@ -158,6 +165,9 @@ function applyToInputs(s) {
   document.getElementById('scrollSpeed').value = sp;
   document.getElementById('val-scrollSpeed').value = sp;
 
+  document.getElementById('portSupplyInterval').value = (s.portSupplyInterval !== undefined) ? s.portSupplyInterval : 15;
+  document.getElementById('portSupplyAmount').value = (s.portSupplyAmount !== undefined) ? s.portSupplyAmount : 2;
+
   const tMode = s.timerMode || 'always';
   const tRadios = document.getElementsByName('timerMode');
   for (const r of tRadios) {
@@ -166,7 +176,15 @@ function applyToInputs(s) {
 
   document.getElementById('timerNotify').checked = (s.timerNotify === true);
   document.getElementById('timerFrame').checked = (s.timerFrame !== false);
+
+  const tcMode = s.timerClickThrough === true ? 'true' : 'false';
+  const tcRadios = document.getElementsByName('timerClickThrough');
+  for (const r of tcRadios) {
+    if (r.value === tcMode) r.checked = true;
+  }
+
   document.getElementById('controlVisible').checked = (s.controlVisible !== false);
+  document.getElementById('numpadEnabled').checked = (s.numpadEnabled !== false);
   document.getElementById('areaVisible').checked = (s.areaVisible !== false);
   document.getElementById('areaFrame').checked = (s.areaFrame !== false);
 
@@ -188,6 +206,7 @@ function applyToInputs(s) {
   for (const r of bgmRadios) {
     if (r.value === bgmMode) r.checked = true;
   }
+  document.getElementById('kc-chk-bgm').checked = (s.bgmEnabled === true);
 
   const ps = s.timerPresets || [10, 20, 30, null];
   document.getElementById('pre1').value = ps[0] || "";

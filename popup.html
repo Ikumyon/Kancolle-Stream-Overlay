@@ -35,9 +35,29 @@
 
     <div class="separator"></div>
 
+    <h2>母港給糧艦システム設定</h2>
+    <div class="control-group" style="margin-bottom: 24px;">
+      <div class="toggle-row">
+        <span class="toggle-label"><i class="fa-solid fa-clock"
+            style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>更新間隔
+          (分)</span>
+        <input type="number" id="portSupplyInterval" class="val-input-num-styled" min="1" max="60" value="15">
+      </div>
+      <div class="toggle-row" style="margin-bottom: 4px;">
+        <span class="toggle-label"><i class="fa-solid fa-arrow-trend-up"
+            style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>上昇値
+          (疲労度)</span>
+        <input type="number" id="portSupplyAmount" class="val-input-num-styled" min="1" max="54" value="2">
+      </div>
+      <div class="note" style="margin-top: 8px; margin-left: 4px;">※設定間隔ごとに、指定した値だけ疲労度の自動回復を加算します。</div>
+    </div>
+
+    <div class="separator"></div>
+
     <h2>表示設定</h2>
     <div class="toggle-row">
-      <span class="toggle-label">表示モード</span>
+      <span class="toggle-label"><i class="fa-solid fa-eye"
+          style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>表示モード</span>
       <div class="radio-group">
         <label class="radio-label">
           <input type="radio" name="timerMode" value="always" checked> 常に表示
@@ -49,12 +69,27 @@
     </div>
 
     <div class="toggle-row">
-      <span class="toggle-label">完了時に通知を送る</span>
+      <span class="toggle-label"><i class="fa-solid fa-bell"
+          style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>完了時に通知を送る</span>
       <input type="checkbox" id="timerNotify">
     </div>
 
     <div class="toggle-row">
-      <span class="toggle-label">ウィンドウ枠を表示</span>
+      <span class="toggle-label"><i class="fa-solid fa-arrow-pointer"
+          style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>背景の操作</span>
+      <div class="segment-control">
+        <label>
+          <input type="radio" name="timerClickThrough" value="false" checked> 無効
+        </label>
+        <label>
+          <input type="radio" name="timerClickThrough" value="true"> 有効
+        </label>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label"><i class="fa-regular fa-window-maximize"
+          style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>パネル枠を表示</span>
       <input type="checkbox" id="timerFrame" checked>
     </div>
   </div>
@@ -133,7 +168,8 @@
       <label>BGMヘッダ (絵文字可)</label>
       <input type="text" id="bgmHeader" class="area-input" placeholder="♪" value="♪">
       <div class="toggle-row" style="margin-top: 4px; padding: 4px;">
-        <span class="toggle-label" style="font-size:11px;">スクロール:</span>
+        <span class="toggle-label" style="font-size:11px;"><i class="fa-solid fa-arrows-left-right"
+            style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>スクロール:</span>
         <div class="radio-group">
           <label class="radio-label" style="font-size:11px;">
             <input type="radio" name="bgmScrollMode" value="normal" checked> 環状シフト
@@ -143,16 +179,24 @@
           </label>
         </div>
       </div>
+      <div class="toggle-row">
+        <span class="toggle-label"><i class="fa-solid fa-music"
+            style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>BGM連動
+          (SSE)</span>
+        <input type="checkbox" id="kc-chk-bgm">
+      </div>
     </div>
 
     <div class="separator"></div>
-    <h2>情報ウィンドウ設定</h2>
+    <h2>情報パネル設定</h2>
     <div class="toggle-row">
-      <span class="toggle-label">ウィンドウを表示する</span>
+      <span class="toggle-label"><i class="fa-solid fa-desktop"
+          style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>パネルを表示する</span>
       <input type="checkbox" id="areaVisible" checked>
     </div>
     <div class="toggle-row">
-      <span class="toggle-label">ウィンドウ枠を表示</span>
+      <span class="toggle-label"><i class="fa-regular fa-window-maximize"
+          style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>パネル枠を表示</span>
       <input type="checkbox" id="areaFrame" checked>
     </div>
   </div>
@@ -162,15 +206,21 @@
   <div id="tab-control" class="content-area">
     <h2>コントロールパネル設定</h2>
     <div class="toggle-row">
-      <span class="toggle-label">パネルを表示する</span>
+      <span class="toggle-label"><i class="fa-solid fa-desktop"
+          style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>パネルを表示する</span>
       <input type="checkbox" id="controlVisible" checked>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label"><i class="fa-solid fa-calculator"
+          style="color:var(--primary); width:20px; text-align:center; display:inline-block; margin-right:4px;"></i>テンキーを表示する</span>
+      <input type="checkbox" id="numpadEnabled" checked>
     </div>
   </div>
 
   <div id="tab-style" class="content-area">
     <h2>全体デザイン設定</h2>
     <div class="control-group">
-      <label>ウィンドウ拡大率 <span id="val-scale" class="val-disp">1.0</span></label>
+      <label>パネル拡大率 <span id="val-scale" class="val-disp">1.0</span></label>
       <input type="range" id="scale" min="0.1" max="2.0" step="0.1" value="1.0">
     </div>
     <div class="control-group">
@@ -203,8 +253,8 @@
     </div>
     <div class="separator"></div>
     <div class="control-group">
-      <label>ウィンドウ位置リセット</label>
-      <button id="centerBtn" class="main-btn btn-center-reset">全ウィンドウを画面中央に集める</button>
+      <label>パネル位置リセット</label>
+      <button id="centerBtn" class="main-btn btn-center-reset">全パネルを画面中央に集める</button>
       <div class="note">※画面外に見失った場合などに使用してください</div>
     </div>
   </div>

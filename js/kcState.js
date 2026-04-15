@@ -4,6 +4,7 @@
 // タイマー制御関数用（Logicで代入）
 let startTimerFunc = null;
 let stopTimerFunc = null;
+let updateBgmConnectionFunc = null;
 
 // テキスト表示設定
 let currentFreeText = "";
@@ -22,6 +23,7 @@ let currentCustomList = "";
 
 // BGM情報
 let currentBgm = "";
+let currentBgmEnabled = false;
 let currentBgmHeader = "♪";
 let currentBgmScrollMode = "normal";
 
@@ -35,6 +37,11 @@ let currentTimerNotify = false;
 let isTimerRunning = false;
 let timerInterval = null; // タイマーID
 
+// 母港給糧艦システム (PortSupply)
+let currentPortSupplyOn = false;
+let currentPortSupplyInterval = 15;
+let currentPortSupplyAmount = 2;
+
 // 海域・イベント設定
 let currentIsEvent = false;
 let currentMapMajor = "";
@@ -44,6 +51,7 @@ let currentStatus = "none";
 
 // UI制御用
 let activeInputId = null;
+let currentNumpadEnabled = true;
 
 // デフォルトスタイル設定 (kcUtils.jsのDEFAULT_SETTINGSを参照)
 const defaultStyle = DEFAULT_SETTINGS;

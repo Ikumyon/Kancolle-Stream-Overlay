@@ -34,7 +34,7 @@
   --kc-shadow-size: 32px;
 }
 
-/* --- すりガラスウィンドウ (共通) --- */
+/* --- すりガラスパネル (共通) --- */
 .kc-display-window {
   position: fixed;
   background: var(--kc-bg-rgba);
@@ -59,6 +59,11 @@
   user-select: none;
   resize: none;
   transition: transform 0.1s, background 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+/* クリック透過 (背景操作有効化) */
+.kc-display-window.kc-click-through {
+  pointer-events: none !important;
 }
 
 /* 枠無効(No Frame)時のスタイル */
@@ -160,13 +165,13 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* --- 情報ウィンドウ --- */
+/* --- 情報パネル --- */
 #kc-win-area {
   min-width: 250px;
   width: 580px;
   overflow: visible !important;
 
-  /* ウィンドウ自体は透明にし、配置のみ担当 */
+  /* パネル自体は透明にし、配置のみ担当 */
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -447,7 +452,7 @@
   z-index: 2147483647;
   font-family: "Segoe UI", sans-serif;
   font-size: 13px;
-  width: 580px;
+  width: 610px;
   resize: none;
 }
 
@@ -490,11 +495,11 @@
 }
 
 .kc-label-side {
-  width: 70px;
-  text-align: left;
+  width: 76px;
+  text-align: center;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 6px 0 0 6px;
-  font-size: 11px;
+  /* padding: 6px 0 0 6px; */
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
   line-height: 1.2;
@@ -618,7 +623,7 @@
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
-  padding: 3px 6px;
+  padding: 4px 0px;
   border-radius: 4px;
   font-family: inherit;
 }

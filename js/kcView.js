@@ -2,7 +2,7 @@
 // DOM生成・描画処理
 
 // -----------------------------------------------------
-// ウィンドウ作成
+// パネル作成
 // -----------------------------------------------------
 function createTimerWindow() {
   const div = document.createElement('div');
@@ -444,10 +444,13 @@ function createControlWindow() {
           </div>
           <div class="kc-btn-row" id="kc-timer-presets-row"></div>
           <div class="kc-cond-row">
+            <label class="kc-check-label kc-cond-port-supply">
+              給<input type="checkbox" id="kc-chk-port-supply">
+            </label>
             <span class="kc-mini-label kc-label-cond">疲労度</span>
-            <input type="text" id="kc-cond-curr" class="kc-input-short kc-numpad-trigger kc-input-cond" placeholder="現在" readonly>
+            <input type="text" id="kc-cond-curr" class="kc-input-short kc-numpad-trigger kc-input-cond" placeholder="現在">
             <span class="kc-arrow-cond">→</span>
-            <input type="text" id="kc-cond-tgt" class="kc-input-short kc-numpad-trigger kc-input-cond" placeholder="目標" value="49" readonly>
+            <input type="text" id="kc-cond-tgt" class="kc-input-short kc-numpad-trigger kc-input-cond" placeholder="目標" value="49">
             <button class="kc-btn kc-btn-cond-set" id="kc-btn-cond-set">設定</button>
           </div>
         </div>
@@ -457,9 +460,9 @@ function createControlWindow() {
         <div class="kc-content-side">
         <div class="kc-setting-row kc-mb-1">
             <label class="kc-check-label"><input type="checkbox" id="kc-chk-event"> 限定(E)</label>
-            <input type="text" id="kc-map-major" class="kc-input-short kc-numpad-trigger" placeholder="1" readonly>
+            <input type="text" id="kc-map-major" class="kc-input-short kc-numpad-trigger" placeholder="1">
             <span class="kc-text-gray">-</span>
-            <input type="text" id="kc-map-minor" class="kc-input-short kc-numpad-trigger" placeholder="1" readonly>
+            <input type="text" id="kc-map-minor" class="kc-input-short kc-numpad-trigger" placeholder="1">
           </div>
           <div class="kc-setting-row kc-mb-1">
             <span class="kc-mini-label kc-label-map">難易度</span>

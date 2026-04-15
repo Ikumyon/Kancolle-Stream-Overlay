@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 
 :root {
     --bg-color: #0f172a;
@@ -30,7 +30,7 @@ body {
     line-height: 1.5;
 }
 
-/* タブ */
+/* 繧ｿ繝・*/
 .tab-container {
     display: flex;
     background: var(--bg-panel);
@@ -62,7 +62,7 @@ body {
     /* Tint */
 }
 
-/* コンテンツ */
+/* 繧ｳ繝ｳ繝・Φ繝・*/
 .content-area {
     padding: 20px;
     display: none;
@@ -85,7 +85,7 @@ body {
     }
 }
 
-/* 見出し・入力 */
+/* 隕句・縺励・蜈･蜉・*/
 h2 {
     margin: 0 0 16px;
     font-size: 15px;
@@ -109,7 +109,7 @@ label {
     font-size: 12px;
 }
 
-/* 入力フォーム共通 */
+/* 蜈･蜉帙ヵ繧ｩ繝ｼ繝蜈ｱ騾・*/
 .area-input {
     width: 100%;
     box-sizing: border-box;
@@ -203,7 +203,7 @@ input[type="color"] {
     box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
 }
 
-/* スイッチ・ラジオボタン */
+/* 繧ｹ繧､繝・メ繝ｻ繝ｩ繧ｸ繧ｪ繝懊ち繝ｳ */
 .toggle-row {
     display: flex;
     align-items: center;
@@ -231,7 +231,7 @@ input[type="checkbox"] {
     accent-color: var(--primary);
 }
 
-/* 小さなチェックボックス用 */
+/* 蟆上＆縺ｪ繝√ぉ繝・け繝懊ャ繧ｯ繧ｹ逕ｨ */
 .chk-s {
     transform: scale(1.0);
     vertical-align: middle;
@@ -276,7 +276,48 @@ input[type="radio"] {
     accent-color: var(--primary);
 }
 
-/* フッター */
+/* 繧ｻ繧ｰ繝｡繝ｳ繝医さ繝ｳ繝医Ο繝ｼ繝ｫ (讓ｪ荳ｦ縺ｳ繝懊ち繝ｳ驕ｸ謚槫ｼ・ */
+.segment-control {
+    display: flex;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 2px;
+    gap: 2px;
+}
+
+.segment-control label {
+    flex: 1;
+    margin: 0;
+    padding: 6px 12px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.segment-control input {
+    display: none;
+}
+
+.segment-control label:has(input:checked) {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.segment-control label:hover:not(:has(input:checked)) {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
+
+/* 繝輔ャ繧ｿ繝ｼ */
 .footer {
     padding: 20px;
     border-top: 1px solid var(--border-color);
@@ -324,7 +365,7 @@ button.reset:hover {
     color: var(--text-main);
 }
 
-/* 入力エリア切り替え用 */
+/* 蜈･蜉帙お繝ｪ繧｢蛻・ｊ譖ｿ縺育畑 */
 .input-mode-box {
     display: none;
 }
@@ -333,8 +374,8 @@ button.reset:hover {
     display: block;
 }
 
-/* --- レイアウトエディタ --- */
-/* カードパレット */
+/* --- 繝ｬ繧､繧｢繧ｦ繝医お繝・ぅ繧ｿ --- */
+/* 繧ｫ繝ｼ繝峨ヱ繝ｬ繝・ヨ */
 .layout-palette {
     display: flex;
     gap: 10px;
@@ -384,7 +425,7 @@ button.reset:hover {
     font-weight: 500;
 }
 
-/* ドロップゾーン */
+/* 繝峨Ο繝・・繧ｾ繝ｼ繝ｳ */
 .layout-dropzone {
     min-height: auto;
     background: var(--bg-input);
@@ -494,7 +535,7 @@ button.reset:hover {
     background: rgba(239, 68, 68, 0.1) !important;
 }
 
-/* 行の右側のホバー判定領域を拡張 */
+/* 陦後・蜿ｳ蛛ｴ縺ｮ繝帙ヰ繝ｼ蛻､螳夐伜沺繧呈僑蠑ｵ */
 .layout-row::after {
     content: '';
     position: absolute;
@@ -533,7 +574,7 @@ button.reset:hover {
     display: none;
 }
 
-/* 配置されたカード */
+/* 驟咲ｽｮ縺輔ｌ縺溘き繝ｼ繝・*/
 .layout-item-placed {
     background: var(--bg-panel);
     border: 1px solid var(--border-color);
@@ -586,7 +627,7 @@ button.reset:hover {
     background: var(--danger);
 }
 
-/* 行内の列 */
+/* 陦悟・縺ｮ蛻・*/
 .layout-column {
     flex: 1;
     min-width: 60px;
@@ -597,7 +638,7 @@ button.reset:hover {
     transition: background 0.2s;
 }
 
-/* 列追加ボタン */
+/* 蛻苓ｿｽ蜉繝懊ち繝ｳ */
 .row-column-add-btn {
     position: absolute;
     top: 50%;
@@ -632,7 +673,7 @@ button.reset:hover {
     background: var(--primary);
 }
 
-/* 列間のリサイザー */
+/* 蛻鈴俣縺ｮ繝ｪ繧ｵ繧､繧ｶ繝ｼ */
 .column-resizer {
     width: 6px;
     background: transparent;
@@ -666,7 +707,7 @@ button.reset:hover {
 }
 
 
-/* リサイザー（カード間の境界） */
+/* 繝ｪ繧ｵ繧､繧ｶ繝ｼ・医き繝ｼ繝蛾俣縺ｮ蠅・阜・・*/
 .layout-resizer {
     width: 6px;
     background: transparent;
@@ -699,7 +740,7 @@ button.reset:hover {
     background: rgba(56, 189, 248, 0.1);
 }
 
-/* ドロップインジケーター（ラバーバンド） */
+/* 繝峨Ο繝・・繧､繝ｳ繧ｸ繧ｱ繝ｼ繧ｿ繝ｼ・医Λ繝舌・繝舌Φ繝会ｼ・*/
 .drop-indicator {
     position: absolute;
     left: 8px;
@@ -716,7 +757,7 @@ button.reset:hover {
 }
 
 .drop-indicator::before {
-    content: 'ここに挿入';
+    content: '縺薙％縺ｫ謖ｿ蜈･';
     position: absolute;
     top: -22px;
     left: 50%;
@@ -747,7 +788,7 @@ button.reset:hover {
     white-space: nowrap;
 }
 
-/* --- 追加のユーティリティ --- */
+/* --- 霑ｽ蜉縺ｮ繝ｦ繝ｼ繝・ぅ繝ｪ繝・ぅ --- */
 .separator {
     border-top: 1px solid var(--border-color);
     margin: 24px 0;
@@ -784,7 +825,7 @@ button.reset:hover {
     position: absolute;
     top: -8px;
     right: 20px;
-    /* Removeボタンの左隣 */
+    /* Remove繝懊ち繝ｳ縺ｮ蟾ｦ髫｣ */
     width: 22px;
     height: 22px;
     background: var(--bg-panel);
@@ -814,4 +855,30 @@ button.reset:hover {
     background: var(--primary);
     color: #fff;
     border-color: var(--primary);
+}
+/* --- Modern Form Inputs for Settings --- */
+.val-input-num-styled {
+    width: 64px;
+    height: 30px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    text-align: center;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.val-input-num-styled:focus {
+    border-color: var(--border-focus);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.val-input-num-styled::-webkit-inner-spin-button,
+.val-input-num-styled::-webkit-outer-spin-button {
+    opacity: 0.6;
+    cursor: pointer;
 }

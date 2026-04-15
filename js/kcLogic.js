@@ -6,9 +6,11 @@ function setupLogic() {
   const inpMajor = document.getElementById('kc-map-major');
   const inpMinor = document.getElementById('kc-map-minor');
   const chkEvent = document.getElementById('kc-chk-event');
+  const chkBgm = document.getElementById('kc-chk-bgm'); // Added
   const inpTimerManual = document.getElementById('kc-timer-manual');
   const inpCondCurr = document.getElementById('kc-cond-curr');
   const inpCondTgt = document.getElementById('kc-cond-tgt');
+  const chkPortSupply = document.getElementById('kc-chk-port-supply'); // 追加
   const numpad = document.getElementById('kc-numpad');
 
   // マップ更新
@@ -22,11 +24,30 @@ function setupLogic() {
 
   // テンキー制御
   const openNumpad = (targetId) => {
+    if (!currentNumpadEnabled) return;
+
     activeInputId = targetId;
     numpad.style.display = 'block';
+
     const targetEl = document.getElementById(targetId);
-    numpad.style.top = (targetEl.offsetTop + targetEl.offsetHeight + 5) + 'px';
-    numpad.style.left = (targetEl.offsetLeft - 40) + 'px';
+
+    // Numpadの親要素とターゲット要素の絶対座標（画面座標）を取得し比較する
+    const targetRect = targetEl.getBoundingClientRect();
+    const parentRect = (numpad.offsetParent || document.body).getBoundingClientRect();
+
+    // 画面座標同士の差分をとることで親からの正確な相対位置を算出
+    const topPos = (targetRect.bottom - parentRect.top) + 5;
+
+    // ターゲット中央への配置： ターゲットの左端(相対) + ターゲット幅半分 - テンキー幅(140)半分
+    let leftPos = (targetRect.left - parentRect.left) + (targetRect.width / 2) - 70;
+
+    // コントロールパネル自体の左端をはみ出さないための簡易なリミッター
+    const ctrlRect = document.getElementById('kc-win-control').getBoundingClientRect();
+    const minLeft = ctrlRect.left - parentRect.left + 5;
+    if (leftPos < minLeft) leftPos = minLeft;
+
+    numpad.style.top = topPos + 'px';
+    numpad.style.left = leftPos + 'px';
   };
 
   const closeNumpad = () => {
@@ -35,7 +56,116 @@ function setupLogic() {
   };
 
   const attachNumpad = (el) => {
-    el.onclick = (e) => { e.stopPropagation(); openNumpad(el.id); };
+    // クリックでNumpadを開く
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openNumpad(el.id);
+    });
+
+    // キーボードの直接入力対応 (inputイベント時のバリデーション等)
+    el.addEventListener('input', () => {
+      // 全角数字や余分な文字を削除し、半角数字のみに整形
+      el.value = el.value.replace(/[^0-9]/g, '');
+
+      // 長さ制限
+      if (el.value.length > 3) {
+        el.value = el.value.slice(0, 3);
+      }
+
+      if (el.id.includes('kc-map')) {
+        updateMap();
+        // kc-map-major で1文字(以上)入力されたら次へフォーカス＆Numpad表示
+        if (el.id === 'kc-map-major' && el.value.length >= 1) {
+          const minorInput = document.getElementById('kc-map-minor');
+          if (minorInput) {
+            minorInput.focus();
+            openNumpad('kc-map-minor');
+          }
+        }
+      } else if (el.id.includes('kc-cond')) {
+        validateCondInputs();
+      }
+    });
+
+    // Numpad非表示時でも機能する、各入力欄でのキー操作対応
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        closeNumpad(); // 開いていれば閉じる
+
+        if (e.shiftKey) {
+          if (el.id === 'kc-timer-manual') {
+            const btn = document.getElementById('kc-btn-manual-set');
+            if (btn) btn.click();
+          } else if (el.id.includes('kc-cond')) {
+            const btn = document.getElementById('kc-btn-cond-set');
+            if (btn) btn.click();
+          }
+        }
+      } else if (e.key === 'Tab') {
+        // Tabキーでのフォーカス遷移＆Numpad表示（疲労度[現在]→[目標]）
+        if (el.id === 'kc-cond-curr') {
+          e.preventDefault();
+          const tgtInput = document.getElementById('kc-cond-tgt');
+          if (tgtInput) {
+            tgtInput.focus();
+            openNumpad('kc-cond-tgt');
+          }
+        }
+      }
+    });
+  };
+
+  attachNumpad(inpMajor);
+  attachNumpad(inpMinor);
+  attachNumpad(inpTimerManual);
+  attachNumpad(inpCondCurr);
+  attachNumpad(inpCondTgt);
+
+  // 母港給糧艦システムトグルのイベント
+  if (chkPortSupply) {
+    chkPortSupply.onchange = () => {
+      currentPortSupplyOn = chkPortSupply.checked;
+      saveLocalData();
+      validateCondInputs();
+      if (inpCondCurr) {
+        inpCondCurr.focus();
+        openNumpad('kc-cond-curr');
+      }
+    };
+  }
+
+  // 疲労度入力値のクリップおよび自動フラグ処理
+  const validateCondInputs = () => {
+    let curr = parseInt(inpCondCurr.value);
+    let tgt = parseInt(inpCondTgt.value);
+
+    // 49超えなら自動でPortSupplyフラグをON
+    if (!isNaN(curr) && curr > 49) {
+      if (!currentPortSupplyOn) {
+        currentPortSupplyOn = true;
+        if (chkPortSupply) chkPortSupply.checked = true;
+        saveLocalData();
+      }
+    }
+    if (!isNaN(tgt) && tgt > 49) {
+      if (!currentPortSupplyOn) {
+        currentPortSupplyOn = true;
+        if (chkPortSupply) chkPortSupply.checked = true;
+        saveLocalData();
+      }
+    }
+
+    const limit = currentPortSupplyOn ? 54 : 49;
+
+    if (!isNaN(curr) && curr > limit) {
+      curr = limit;
+      inpCondCurr.value = curr;
+    }
+    if (!isNaN(tgt) && tgt > limit) {
+      tgt = limit;
+      inpCondTgt.value = tgt;
+    }
   };
 
   attachNumpad(inpMajor);
@@ -46,7 +176,12 @@ function setupLogic() {
 
   chkEvent.onchange = () => {
     updateMap();
-    if (chkEvent.checked) openNumpad('kc-map-major');
+    if (chkEvent.checked) {
+      if (inpMajor) {
+        inpMajor.focus();
+        openNumpad('kc-map-major');
+      }
+    }
   };
 
   document.querySelectorAll('.kc-num-btn').forEach(btn => {
@@ -58,11 +193,20 @@ function setupLogic() {
       if (activeInputId.includes('kc-map')) {
         input.value = num;
         updateMap();
-        if (activeInputId === 'kc-map-major') openNumpad('kc-map-minor');
-        else if (activeInputId === 'kc-map-minor') closeNumpad();
+        // Numpad操作時も自動遷移・ハイライト機能を入れる
+        if (activeInputId === 'kc-map-major' && input.value.length >= 1) {
+          const minorInput = document.getElementById('kc-map-minor');
+          if (minorInput) {
+            minorInput.focus();
+            openNumpad('kc-map-minor');
+          }
+        }
       } else {
         if (input.value.length < 3) {
           input.value += num;
+          if (activeInputId.includes('kc-cond')) {
+            validateCondInputs();
+          }
         }
       }
     };
@@ -74,6 +218,7 @@ function setupLogic() {
       const input = document.getElementById(activeInputId);
       input.value = input.value.slice(0, -1);
       if (activeInputId.includes('kc-map')) updateMap();
+      if (activeInputId.includes('kc-cond')) validateCondInputs();
     }
   };
 
@@ -153,9 +298,21 @@ function setupLogic() {
     const curr = parseInt(inpCondCurr.value);
     const tgt = parseInt(inpCondTgt.value);
     if (!isNaN(curr) && !isNaN(tgt)) {
-      let diff = tgt - curr;
-      if (diff < 0) diff = 0;
-      startTimerFunc(diff);
+      if (tgt <= curr) {
+        startTimerFunc(0);
+        return;
+      }
+
+      let time = 0;
+      let val = curr;
+      while (val < tgt && time < 60) {
+        time += 3;
+        val = Math.min(val + 3, 49);
+        if (time % currentPortSupplyInterval === 0 && currentPortSupplyOn) {
+          val = Math.min(val + currentPortSupplyAmount, 54);
+        }
+      }
+      startTimerFunc(time);
     }
   };
 
@@ -182,74 +339,103 @@ function setupLogic() {
   renderTimerPresets();
 
   // BGM更新監視 (Direct SSE Connection)
-  const setupBgmSSE = () => {
-    console.log('[KCO-Logic] Setting up direct SSE connection...');
+  let eventSource = null;
+  const SSE_URL = 'http://127.0.0.1:5001/sse';
 
-    const SSE_URL = 'http://127.0.0.1:5001/sse';
-    let eventSource = null;
+  const updateBgmConnection = () => {
+    // 既存の接続があれば閉じる
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
 
-    const connectSSE = () => {
-      if (eventSource) {
-        eventSource.close();
-      }
+    // 設定がOFFなら接続しない
+    if (!currentBgmEnabled) {
+      console.log('[KCO-Logic] SSE Disabled by user setting');
+      currentBgm = "連動機能無効"; // ステータス表示更新
+      renderInfoDisplay();
+      return;
+    }
 
-      console.log('[KCO-Logic] Connecting to SSE:', SSE_URL);
-      eventSource = new EventSource(SSE_URL);
+    // 接続開始表示
+    currentBgm = "接続待機中...";
+    renderInfoDisplay();
 
-      eventSource.onopen = () => {
-        console.log('[KCO-Logic] SSE Connected');
-      };
+    console.log('[KCO-Logic] Connecting to SSE:', SSE_URL);
+    eventSource = new EventSource(SSE_URL);
 
-      eventSource.addEventListener('nowplaying', (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          console.log('[KCO-Logic] Received nowplaying:', data);
-
-          if (data) {
-            let needsRender = false;
-
-            if (typeof data.title === 'string') {
-              if (currentBgm !== data.title) {
-                console.log('[KCO-Logic] Updating BGM from', currentBgm, 'to', data.title);
-                currentBgm = data.title;
-                needsRender = true;
-              }
-            }
-
-            if (data.senka !== undefined) {
-              const newSenka = String(data.senka);
-              if (currentSenka !== newSenka) {
-                console.log('[KCO-Logic] Updating Senka from', currentSenka, 'to', newSenka);
-                currentSenka = newSenka;
-                needsRender = true;
-              }
-            }
-
-            if (needsRender) {
-              renderInfoDisplay();
-            } else {
-              console.log('[KCO-Logic] Data unchanged, skipping render');
-            }
-          }
-        } catch (e) {
-          console.error('[KCO-Logic] JSON Parse Error:', e);
-        }
-      });
-
-      eventSource.onerror = (err) => {
-        console.warn('[KCO-Logic] SSE Error (will retry):', err);
-        // 5秒後に再接続
-        setTimeout(() => {
-          console.log('[KCO-Logic] Reconnecting SSE...');
-          connectSSE();
-        }, 5000);
-      };
+    eventSource.onopen = () => {
+      console.log('[KCO-Logic] SSE Connected');
+      currentBgm = "接続完了"; // データが来るまではこれで
+      renderInfoDisplay();
     };
 
-    connectSSE();
-  };
-  setupBgmSSE();
+    eventSource.addEventListener('nowplaying', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        // console.log('[KCO-Logic] Received nowplaying:', data);
 
+        if (data) {
+          let needsRender = false;
+
+          if (typeof data.title === 'string') {
+            if (currentBgm !== data.title) {
+              console.log('[KCO-Logic] Updating BGM from', currentBgm, 'to', data.title);
+              currentBgm = data.title;
+              needsRender = true;
+            }
+          }
+
+          if (data.senka !== undefined) {
+            const newSenka = String(data.senka);
+            if (currentSenka !== newSenka) {
+              // console.log('[KCO-Logic] Updating Senka from', currentSenka, 'to', newSenka);
+              currentSenka = newSenka;
+              needsRender = true;
+            }
+          }
+
+          if (needsRender) {
+            renderInfoDisplay();
+          }
+        }
+      } catch (e) {
+        console.error('[KCO-Logic] JSON Parse Error:', e);
+      }
+    });
+
+    eventSource.onerror = (err) => {
+      console.warn('[KCO-Logic] SSE Error (will retry):', err);
+      // エラー時一旦閉じる
+      if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+      }
+
+      // 5秒後に再接続 (設定がONのままなら)
+      if (currentBgmEnabled) {
+        setTimeout(() => {
+          console.log('[KCO-Logic] Reconnecting SSE...');
+          updateBgmConnection();
+        }, 5000);
+      }
+    };
+  };
+
+  // グローバルからアクセス可能にする
+  updateBgmConnectionFunc = updateBgmConnection;
+
+  // BGM設定変更監視
+  if (chkBgm) {
+    chkBgm.onchange = () => {
+      currentBgmEnabled = chkBgm.checked;
+      saveLocalData();
+      updateBgmConnection();
+    };
+  }
+
+  // 初期化実行
+  updateBgmConnection();
 }
 
 function handleTagClick(index) {
@@ -337,9 +523,17 @@ function saveLocalData() {
     diff: currentDifficulty,
     status: currentStatus,
     customTitle: currentCustomTitle,
-    customList: currentCustomList
+    diff: currentDifficulty,
+    status: currentStatus,
+    customTitle: currentCustomTitle,
+    customList: currentCustomList,
+    bgmEnabled: currentBgmEnabled, // Added
+    portSupplyOn: currentPortSupplyOn // 追加
   };
   localStorage.setItem('kc_map_settings', JSON.stringify(data));
+
+  // Background側と同期するためにストレージにも保存
+  chrome.storage.local.set({ bgmEnabled: currentBgmEnabled });
 }
 
 function restoreLocalData() {
@@ -357,6 +551,16 @@ function restoreLocalData() {
       currentCustomList = d.customList || d.manualText || "";
 
       document.getElementById('kc-chk-event').checked = currentIsEvent;
+      // BGM設定復元
+      currentBgmEnabled = (d.bgmEnabled === true); // デフォルトfalse
+      const elBgm = document.getElementById('kc-chk-bgm');
+      if (elBgm) elBgm.checked = currentBgmEnabled;
+
+      // PortSupply設定復元
+      currentPortSupplyOn = (d.portSupplyOn === true);
+      const elPortSupply = document.getElementById('kc-chk-port-supply');
+      if (elPortSupply) elPortSupply.checked = currentPortSupplyOn;
+
       document.getElementById('kc-map-major').value = currentMapMajor;
       document.getElementById('kc-map-minor').value = currentMapMinor;
 
@@ -454,8 +658,24 @@ function applyStyles(s) {
 
   updateTimerVisibility();
   updateWindowStatus('kc-win-timer', true, s.timerFrame);
+
+  // クリック透過設定の反映
+  const winTimer = document.getElementById('kc-win-timer');
+  if (winTimer) {
+    if (s.timerClickThrough) winTimer.classList.add('kc-click-through');
+    else winTimer.classList.remove('kc-click-through');
+  }
+
   updateWindowStatus('kc-win-area', s.areaVisible, s.areaFrame);
   updateWindowStatus('kc-win-control', s.controlVisible, true);
+
+  if (s.numpadEnabled !== undefined) {
+    currentNumpadEnabled = (s.numpadEnabled === true);
+    if (!currentNumpadEnabled) {
+      const numpad = document.getElementById('kc-numpad');
+      if (numpad) numpad.style.display = 'none';
+    }
+  }
 
   // レイアウト更新
   if (typeof updateLayout === 'function') {
@@ -479,6 +699,23 @@ function applyStyles(s) {
     currentTimerPresets = [10, 20, 30, null];
   }
   renderTimerPresets();
+
+  if (s.portSupplyInterval !== undefined) currentPortSupplyInterval = s.portSupplyInterval;
+  if (s.portSupplyAmount !== undefined) currentPortSupplyAmount = s.portSupplyAmount;
+
+  // BGM連動設定の反映
+  if (s.bgmEnabled !== undefined) {
+    const wasEnabled = currentBgmEnabled;
+    currentBgmEnabled = (s.bgmEnabled === true);
+
+    // ストレージに同期
+    chrome.storage.local.set({ bgmEnabled: currentBgmEnabled });
+
+    // 接続状態を更新（updateBgmConnectionFuncが定義されている場合のみ）
+    if (typeof updateBgmConnectionFunc === 'function' && wasEnabled !== currentBgmEnabled) {
+      updateBgmConnectionFunc();
+    }
+  }
 
   renderInfoDisplay();
 }
