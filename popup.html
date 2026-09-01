@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>艦これオーバーレイ設定</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <header class="app-header">
+    <div>
+      <p class="app-eyebrow">KANCOLLE STREAM OVERLAY</p>
+      <h1>オーバーレイ設定</h1>
+    </div>
+    <span class="app-version">v1.0</span>
+  </header>
+
+  <nav class="tab-container" aria-label="設定カテゴリー" role="tablist">
+    <button class="tab-btn active" data-target="tab-timer" role="tab" aria-selected="true">
+      <span class="tab-icon" aria-hidden="true">◷</span><span>タイマー</span>
+    </button>
+    <button class="tab-btn" data-target="tab-info" role="tab" aria-selected="false">
+      <span class="tab-icon" aria-hidden="true">▦</span><span>情報</span>
+    </button>
+    <button class="tab-btn" data-target="tab-control" role="tab" aria-selected="false">
+      <span class="tab-icon" aria-hidden="true">◫</span><span>パネル</span>
+    </button>
+    <button class="tab-btn" data-target="tab-style" role="tab" aria-selected="false">
+      <span class="tab-icon" aria-hidden="true">✦</span><span>デザイン</span>
+    </button>
+  </nav>
+
+  <main class="app-content">
+    <section id="tab-timer" class="content-area active" role="tabpanel">
+      <div class="page-heading">
+        <div><p class="section-kicker">TIMER</p><h2>タイマー</h2></div>
+        <p>疲労回復の計算と通知をまとめて設定します。</p>
+      </div>
+
+      <section class="settings-card">
+        <div class="settings-card-header">
+          <span class="card-heading-icon" aria-hidden="true">◴</span>
+          <div><h3>プリセット</h3><p>よく使う時間を最大4件まで登録できます。</p></div>
+        </div>
+        <div class="preset-row" aria-label="タイマープリセット（分）">
+          <label><span>1</span><input type="number" id="pre1" class="preset-input" placeholder="10" aria-label="プリセット1（分）"></label>
+          <label><span>2</span><input type="number" id="pre2" class="preset-input" placeholder="20" aria-label="プリセット2（分）"></label>
+          <label><span>3</span><input type="number" id="pre3" class="preset-input" placeholder="30" aria-label="プリセット3（分）"></label>
+          <label><span>4</span><input type="number" id="pre4" class="preset-input" placeholder="空欄" aria-label="プリセット4（分）"></label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card-header">
+          <span class="card-heading-icon" aria-hidden="true">＋</span>
+          <div><h3>疲労回復計算</h3><p>現在値と目標値から必要時間を確認できます。</p></div>
+        </div>
+        <div class="recovery-calculator">
+          <label class="field"><span>現在値</span><input type="number" id="recoveryCurrent" min="0" max="54" placeholder="例 20"></label>
+          <span class="calculator-arrow" aria-hidden="true">→</span>
+          <label class="field"><span>目標値</span><input type="number" id="recoveryTarget" min="0" max="54" placeholder="例 49"></label>
+          <output id="recoveryResult" class="recovery-result" aria-live="polite">値を入力</output>
+        </div>
+        <div class="subsection">
+          <div class="subsection-heading"><div><h4>母港給糧艦</h4><p>49を超える疲労度の回復条件</p></div><span class="status-chip">計算に使用</span></div>
+          <div class="field-grid two-columns">
+            <label class="field"><span>更新間隔</span><div class="input-with-unit"><input type="number" id="portSupplyInterval" min="1" max="60" value="15"><span>分</span></div></label>
+            <label class="field"><span>上昇値</span><div class="input-with-unit"><input type="number" id="portSupplyAmount" min="1" max="54" value="2"><span>疲労度</span></div></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card-header"><span class="card-heading-icon" aria-hidden="true">◎</span><div><h3>動作</h3><p>タイマーの表示条件と通知を設定します。</p></div></div>
+        <div class="setting-row">
+          <div><strong>表示モード</strong><small>待機中も表示するか選択</small></div>
+          <div class="segment-control" role="group" aria-label="タイマー表示モード">
+            <label><input type="radio" name="timerMode" value="always" checked><span>常に表示</span></label>
+            <label><input type="radio" name="timerMode" value="auto"><span>動作中のみ</span></label>
+          </div>
+        </div>
+        <label class="setting-row setting-row-clickable" for="timerNotify">
+          <div><strong>完了通知</strong><small>回復完了時にデスクトップ通知を送信</small></div>
+          <span class="switch"><input type="checkbox" id="timerNotify"><span aria-hidden="true"></span></span>
+        </label>
+      </section>
+    </section>
+
+    <section id="tab-info" class="content-area" role="tabpanel" hidden>
+      <div class="page-heading">
+        <div><p class="section-kicker">INFORMATION</p><h2>情報パネル</h2></div>
+        <p>表示カードを配置し、選択したカードの内容を編集します。</p>
+      </div>
+
+      <section class="settings-card layout-editor-card">
+        <div class="settings-card-header"><span class="card-heading-icon" aria-hidden="true">▦</span><div><h3>レイアウト</h3><p>ドラッグまたはクリックで空の列へカードを配置します。</p></div></div>
+        <div id="layout-palette" class="layout-palette" aria-label="追加できるカード"></div>
+        <div class="layout-toolbar">
+          <span>情報パネルプレビュー</span>
+          <button id="btn-snap-toggle" class="icon-text-btn active" type="button" aria-pressed="true"><span aria-hidden="true">⌁</span>比率スナップ</button>
+        </div>
+        <div id="layout-dropzone" class="layout-dropzone" aria-label="カード配置エリア"></div>
+        <p class="helper-text">カードを選択すると、下の編集欄が切り替わります。列の境界をドラッグすると幅を調整できます。</p>
+      </section>
+
+      <section class="settings-card card-inspector">
+        <div class="settings-card-header compact"><span class="card-heading-icon" aria-hidden="true">✎</span><div><h3 id="cardInspectorTitle">カード設定</h3><p id="cardInspectorDescription">編集するカードを選択してください。</p></div></div>
+
+        <div class="card-settings-panel active" data-card-settings="none">
+          <div class="empty-state"><span aria-hidden="true">↑</span><strong>カードを選択</strong><p>パレットまたは配置済みカードを選ぶと設定を表示します。</p></div>
+        </div>
+        <div class="card-settings-panel" data-card-settings="map">
+          <div class="info-callout"><span aria-hidden="true">ⓘ</span><p>海域、難易度、進行状態はオーバーレイのコントロールパネルから変更します。</p></div>
+        </div>
+        <div class="card-settings-panel" data-card-settings="text">
+          <label class="field"><span>自由記述</span><textarea id="infoFreeText" rows="3" placeholder="例: ラスダン沼り中 / S勝利狙い"></textarea></label>
+          <fieldset class="field"><legend>スクロール方式</legend><div class="segment-control full"><label><input type="radio" name="freeTextScrollMode" value="normal" checked><span>環状シフト</span></label><label><input type="radio" name="freeTextScrollMode" value="circular"><span>無限スクロール</span></label></div></fieldset>
+        </div>
+        <div class="card-settings-panel" data-card-settings="list">
+          <label class="field"><span>タイトル</span><input type="text" id="infoCustomTitle" placeholder="例: 掘り進捗"></label>
+          <label class="field"><span>リスト</span><textarea id="infoCustomList" rows="5" placeholder="項目1, 項目2:+0/5, 項目3:-10/2"></textarea></label>
+          <p class="helper-text"><code>艦名:+値/上限</code> で加算、<code>艦名:-値/下限</code> で減算できます。</p>
+        </div>
+        <div class="card-settings-panel" data-card-settings="BGMtitle">
+          <div class="field-grid two-columns">
+            <label class="field"><span>ヘッダー</span><input type="text" id="bgmHeader" placeholder="♪" value="♪"></label>
+            <label class="setting-row setting-row-clickable compact" for="kc-chk-bgm"><div><strong>BGM連動</strong><small>SSEから曲名を受信</small></div><span class="switch"><input type="checkbox" id="kc-chk-bgm"><span aria-hidden="true"></span></span></label>
+          </div>
+          <fieldset class="field"><legend>スクロール方式</legend><div class="segment-control full"><label><input type="radio" name="bgmScrollMode" value="normal" checked><span>環状シフト</span></label><label><input type="radio" name="bgmScrollMode" value="circular"><span>無限スクロール</span></label></div></fieldset>
+          <div id="bgmConnectionPreview" class="connection-status" data-state="disabled"><span class="status-dot"></span><span>BGM連動は無効です</span></div>
+        </div>
+        <div class="card-settings-panel" data-card-settings="senka">
+          <div class="info-callout"><span aria-hidden="true">ⓘ</span><p>戦果はBGM連動のデータに含まれる場合、自動で更新されます。</p></div>
+        </div>
+      </section>
+    </section>
+
+    <section id="tab-control" class="content-area" role="tabpanel" hidden>
+      <div class="page-heading">
+        <div><p class="section-kicker">PANELS</p><h2>パネル管理</h2></div>
+        <p>3つのパネルの表示と操作方法をまとめて管理します。</p>
+      </div>
+
+      <div class="panel-list">
+        <section class="panel-settings-card" data-panel="timer">
+          <div class="panel-card-title"><span class="panel-symbol" aria-hidden="true">◷</span><div><h3>タイマー</h3><p>回復時間と終了時刻</p></div><span class="panel-state" id="timerPanelState">表示</span></div>
+          <label class="setting-row setting-row-clickable" for="timerFrame"><div><strong>パネル枠</strong><small>背景とヘッダーを表示</small></div><span class="switch"><input type="checkbox" id="timerFrame" checked><span aria-hidden="true"></span></span></label>
+          <div class="setting-row"><div><strong>背景の操作</strong><small>クリックを背面へ通す</small></div><div class="segment-control"><label><input type="radio" name="timerClickThrough" value="false" checked><span>操作する</span></label><label><input type="radio" name="timerClickThrough" value="true"><span>透過する</span></label></div></div>
+        </section>
+
+        <section class="panel-settings-card" data-panel="area">
+          <div class="panel-card-title"><span class="panel-symbol" aria-hidden="true">▦</span><div><h3>情報パネル</h3><p>海域・文章・リスト・BGM</p></div><span class="panel-state" id="areaPanelState">表示</span></div>
+          <label class="setting-row setting-row-clickable" for="areaVisible"><div><strong>パネルを表示</strong><small>配信画面への表示を切り替え</small></div><span class="switch"><input type="checkbox" id="areaVisible" checked><span aria-hidden="true"></span></span></label>
+          <label class="setting-row setting-row-clickable" for="areaFrame"><div><strong>パネル枠</strong><small>背景とヘッダーを表示</small></div><span class="switch"><input type="checkbox" id="areaFrame" checked><span aria-hidden="true"></span></span></label>
+        </section>
+
+        <section class="panel-settings-card" data-panel="control">
+          <div class="panel-card-title"><span class="panel-symbol" aria-hidden="true">⌨</span><div><h3>コントロール</h3><p>海域・タイマーの直接操作</p></div><span class="panel-state" id="controlPanelState">表示</span></div>
+          <label class="setting-row setting-row-clickable" for="controlVisible"><div><strong>パネルを表示</strong><small>操作パネル全体を表示</small></div><span class="switch"><input type="checkbox" id="controlVisible" checked><span aria-hidden="true"></span></span></label>
+          <label class="setting-row setting-row-clickable" for="numpadEnabled"><div><strong>テンキー</strong><small>数値入力時に画面上へ表示</small></div><span class="switch"><input type="checkbox" id="numpadEnabled" checked><span aria-hidden="true"></span></span></label>
+        </section>
+      </div>
+
+      <section class="settings-card action-card">
+        <div><h3>位置とサイズ</h3><p>パネルを見失った場合は中央へ戻せます。</p></div>
+        <button id="centerBtn" class="secondary-btn" type="button"><span aria-hidden="true">⌖</span>全パネルを中央へ戻す</button>
+      </section>
+    </section>
+
+    <section id="tab-style" class="content-area" role="tabpanel" hidden>
+      <div class="page-heading">
+        <div><p class="section-kicker">APPEARANCE</p><h2>デザイン</h2></div>
+        <p>プレビューを見ながら共通の外観を調整します。</p>
+      </div>
+
+      <div class="design-preview-wrap">
+        <div id="designPreview" class="design-preview">
+          <span class="preview-handle">OVERLAY PREVIEW</span>
+          <div class="preview-content"><span class="preview-badge">E-2</span><strong>終了まで 12:34</strong><small>配信オーバーレイの表示例</small></div>
+        </div>
+      </div>
+
+      <section class="settings-card">
+        <div class="settings-card-header compact"><span class="card-heading-icon" aria-hidden="true">Aa</span><div><h3>サイズ</h3><p>パネルと文字の基準サイズ</p></div></div>
+        <label class="range-field"><span><strong>パネル拡大率</strong><output id="val-scale">1.0</output></span><input type="range" id="scale" min="0.1" max="2.0" step="0.1" value="1.0"></label>
+        <label class="range-field"><span><strong>基本文字サイズ</strong><output id="val-fsize">36px</output></span><input type="range" id="fontSize" min="20" max="60" value="36"></label>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card-header compact"><span class="card-heading-icon" aria-hidden="true">◐</span><div><h3>背景と効果</h3><p>透明度、ぼかし、影を調整</p></div></div>
+        <label class="field"><span>背景色</span><div class="color-field"><input type="color" id="bgColor" value="#0a192d"><output id="val-bgColor">#0a192d</output></div></label>
+        <label class="range-field"><span><strong>背景の不透明度</strong><output id="val-bgOpacity">65%</output></span><input type="range" id="bgOpacity" min="0" max="1" step="0.05" value="0.65"></label>
+        <label class="range-field"><span><strong>背景ぼかし</strong><output id="val-blur">10px</output></span><input type="range" id="blur" min="0" max="20" value="10"></label>
+        <label class="range-field"><span><strong>影の広がり</strong><output id="val-shadowSize">32px</output></span><input type="range" id="shadowSize" min="0" max="100" value="32"></label>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card-header compact"><span class="card-heading-icon" aria-hidden="true">↔</span><div><h3>動き</h3><p>長い文章のスクロール速度</p></div></div>
+        <label class="range-field"><span><strong>スクロール速度</strong><input type="number" id="val-scrollSpeed" min="1" max="100" value="50"></span><input type="range" id="scrollSpeed" min="1" max="100" value="50"><span class="range-scale"><small>ゆっくり</small><small>速い</small></span></label>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div id="saveStatus" class="save-status" data-state="saved" role="status" aria-live="polite"><span class="status-dot"></span><span>保存済み</span></div>
+    <div class="footer-actions">
+      <button id="resetBtn" class="secondary-btn danger" type="button">初期設定に戻す</button>
+      <button id="saveBtn" class="primary-btn" type="button">保存して反映</button>
+    </div>
+  </footer>
+
+  <script src="js/kcSettings.js"></script>
+  <script src="js/kcUtils.js"></script>
+  <script src="js/kcTimer.js"></script>
+  <script src="js/popup_form.js"></script>
+  <script src="js/popup_layout_model.js"></script>
+  <script src="js/popup_layout_editor.js"></script>
+  <script src="js/popup.js"></script>
+</body>
+
+</html>

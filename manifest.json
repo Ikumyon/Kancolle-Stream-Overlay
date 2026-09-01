@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Kancolle Stream Overlay",
+  "version": "1.0",
+  "description": "艦これ配信用の多機能オーバーレイ",
+  "icons": {
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "permissions": [
+    "storage",
+    "notifications"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:5001/*"
+  ],
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "js/kcSettings.js",
+        "js/kcUtils.js",
+        "js/kcState.js",
+        "js/kcPersistence.js",
+        "js/kcLayoutView.js",
+        "js/kcCardView.js",
+        "js/kcView.js",
+        "js/kcMedia.js",
+        "js/kcTimer.js",
+        "js/kcSettingsController.js",
+        "js/kcLogic.js",
+        "js/kcEntry.js"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "all_frames": false
+    }
+  ]
+}
