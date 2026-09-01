@@ -31,7 +31,10 @@ function applyStyles(input) {
   updateWindowStatus('kc-win-control', settings.controlVisible, true);
 
   const timerWindow = document.getElementById('kc-win-timer');
-  if (timerWindow) timerWindow.classList.toggle('kc-click-through', settings.timerClickThrough);
+  if (timerWindow) {
+    timerWindow.classList.toggle('kc-click-through', settings.timerClickThrough);
+    timerWindow._requestTimerFit?.();
+  }
   const numpad = document.getElementById('kc-numpad');
   if (numpad && !currentNumpadEnabled) numpad.style.display = 'none';
 

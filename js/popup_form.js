@@ -76,8 +76,12 @@
   }
 
   function updateLabels() {
-    byId('val-scale').textContent = byId('scale').value;
-    byId('val-fsize').textContent = `${byId('fontSize').value}px`;
+    byId('val-scale').value = byId('scale').value;
+    byId('val-fsize').value = byId('fontSize').value;
+    byId('val-bgOpacity').value = Math.round(Number(byId('bgOpacity').value) * 100);
+    byId('val-blur').value = byId('blur').value;
+    byId('val-shadowSize').value = byId('shadowSize').value;
+    byId('val-scrollSpeed').value = byId('scrollSpeed').value;
   }
 
   global.KcPopupForm = Object.freeze({ read, apply, updateLabels });

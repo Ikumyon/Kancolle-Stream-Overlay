@@ -184,21 +184,21 @@
 
       <section class="settings-card">
         <div class="settings-card-header compact"><span class="card-heading-icon" aria-hidden="true">Aa</span><div><h3>サイズ</h3><p>パネルと文字の基準サイズ</p></div></div>
-        <label class="range-field"><span><strong>パネル拡大率</strong><output id="val-scale">1.0</output></span><input type="range" id="scale" min="0.1" max="2.0" step="0.1" value="1.0"></label>
-        <label class="range-field"><span><strong>基本文字サイズ</strong><output id="val-fsize">36px</output></span><input type="range" id="fontSize" min="20" max="60" value="36"></label>
+        <label class="range-field"><span><strong>パネル拡大率</strong><input class="range-value-input" type="number" id="val-scale" min="0.1" max="2.0" step="0.1" value="1.0"></span><input type="range" id="scale" min="0.1" max="2.0" step="0.1" value="1.0"></label>
+        <label class="range-field"><span><strong>基本文字サイズ</strong><input class="range-value-input" type="number" id="val-fsize" min="20" max="60" step="1" value="36"></span><input type="range" id="fontSize" min="20" max="60" value="36"></label>
       </section>
 
       <section class="settings-card">
         <div class="settings-card-header compact"><span class="card-heading-icon" aria-hidden="true">◐</span><div><h3>背景と効果</h3><p>透明度、ぼかし、影を調整</p></div></div>
         <label class="field"><span>背景色</span><div class="color-field"><input type="color" id="bgColor" value="#0a192d"><output id="val-bgColor">#0a192d</output></div></label>
-        <label class="range-field"><span><strong>背景の不透明度</strong><output id="val-bgOpacity">65%</output></span><input type="range" id="bgOpacity" min="0" max="1" step="0.05" value="0.65"></label>
-        <label class="range-field"><span><strong>背景ぼかし</strong><output id="val-blur">10px</output></span><input type="range" id="blur" min="0" max="20" value="10"></label>
-        <label class="range-field"><span><strong>影の広がり</strong><output id="val-shadowSize">32px</output></span><input type="range" id="shadowSize" min="0" max="100" value="32"></label>
+        <label class="range-field"><span><strong>背景の不透明度（%）</strong><input class="range-value-input" type="number" id="val-bgOpacity" min="0" max="100" step="5" value="65"></span><input type="range" id="bgOpacity" min="0" max="1" step="0.05" value="0.65"></label>
+        <label class="range-field"><span><strong>背景ぼかし（px）</strong><input class="range-value-input" type="number" id="val-blur" min="0" max="20" step="1" value="10"></span><input type="range" id="blur" min="0" max="20" value="10"></label>
+        <label class="range-field"><span><strong>影の広がり（px）</strong><input class="range-value-input" type="number" id="val-shadowSize" min="0" max="100" step="1" value="32"></span><input type="range" id="shadowSize" min="0" max="100" value="32"></label>
       </section>
 
       <section class="settings-card">
         <div class="settings-card-header compact"><span class="card-heading-icon" aria-hidden="true">↔</span><div><h3>動き</h3><p>長い文章のスクロール速度</p></div></div>
-        <label class="range-field"><span><strong>スクロール速度</strong><input type="number" id="val-scrollSpeed" min="1" max="100" value="50"></span><input type="range" id="scrollSpeed" min="1" max="100" value="50"><span class="range-scale"><small>ゆっくり</small><small>速い</small></span></label>
+        <label class="range-field"><span><strong>スクロール速度</strong><input class="range-value-input" type="number" id="val-scrollSpeed" min="1" max="100" value="50"></span><input type="range" id="scrollSpeed" min="1" max="100" value="50"><span class="range-scale"><small>ゆっくり</small><small>速い</small></span></label>
       </section>
     </section>
   </main>

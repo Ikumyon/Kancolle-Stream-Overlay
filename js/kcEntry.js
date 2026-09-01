@@ -46,6 +46,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (el) {
         el.style.width = "";
         el.style.height = "";
+        if (id === 'kc-win-timer') el.style.removeProperty('--kc-font-size');
         const rect = el.getBoundingClientRect();
         const top = (window.innerHeight - rect.height) / 2 + (offsetStep * 40);
         const left = (window.innerWidth - rect.width) / 2 + (offsetStep * 20);

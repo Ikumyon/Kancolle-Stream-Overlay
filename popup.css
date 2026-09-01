@@ -1086,13 +1086,13 @@ fieldset.field {
 
 .range-field output,
 .color-field output,
-#val-scrollSpeed {
+.range-value-input {
   color: var(--ui-primary);
   font-size: 10px;
   font-weight: 800;
 }
 
-#val-scrollSpeed {
+.range-value-input {
   width: 56px;
   padding: 4px 6px;
   text-align: center;

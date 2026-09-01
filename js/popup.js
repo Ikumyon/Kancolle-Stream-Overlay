@@ -6,6 +6,7 @@ let popupReady = false;
 document.addEventListener('DOMContentLoaded', () => {
   setupTabs();
   setupActions();
+  setupRangeValueSync();
   setupFormFeedback();
   setupRecoveryPreview();
 
@@ -74,6 +75,33 @@ function setupFormFeedback() {
   });
   document.addEventListener('kc-layout-change', () => {
     if (popupReady) setSaveState('dirty');
+  });
+}
+
+function setupRangeValueSync() {
+  const fields = [
+    { rangeId: 'scale', inputId: 'val-scale' },
+    { rangeId: 'fontSize', inputId: 'val-fsize' },
+    { rangeId: 'bgOpacity', inputId: 'val-bgOpacity', toRange: (value) => value / 100, toInput: (value) => Math.round(value * 100) },
+    { rangeId: 'blur', inputId: 'val-blur' },
+    { rangeId: 'shadowSize', inputId: 'val-shadowSize' },
+    { rangeId: 'scrollSpeed', inputId: 'val-scrollSpeed' }
+  ];
+
+  fields.forEach(({ rangeId, inputId, toRange = Number, toInput = Number }) => {
+    const range = document.getElementById(rangeId);
+    const numberInput = document.getElementById(inputId);
+    const minimum = Number(range.min);
+    const maximum = Number(range.max);
+    const syncInput = () => { numberInput.value = String(toInput(Number(range.value))); };
+
+    range.addEventListener('input', syncInput);
+    numberInput.addEventListener('input', () => {
+      const value = toRange(Number(numberInput.value));
+      if (!Number.isFinite(value)) return;
+      range.value = String(Math.min(maximum, Math.max(minimum, value)));
+    });
+    numberInput.addEventListener('change', syncInput);
   });
 }
 
@@ -160,9 +188,6 @@ function updateDesignPreview() {
   preview.style.fontSize = `${Math.max(10, fontSize * 0.38)}px`;
   preview.style.transform = `scale(${0.9 + scale * 0.1})`;
   document.getElementById('val-bgColor').textContent = color.toUpperCase();
-  document.getElementById('val-bgOpacity').textContent = `${Math.round(opacity * 100)}%`;
-  document.getElementById('val-blur').textContent = `${blur}px`;
-  document.getElementById('val-shadowSize').textContent = `${shadow}px`;
 }
 
 function setSaveState(state) {

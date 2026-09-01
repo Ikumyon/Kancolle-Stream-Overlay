@@ -7,14 +7,17 @@
 function createTimerWindow() {
   const div = document.createElement('div');
   div.id = 'kc-win-timer';
-  div.className = 'kc-display-window';
+  div.className = 'kc-display-window kc-panel-surface';
   div.innerHTML = `
-    <div class="kc-header-transparent" id="kc-drag-timer"><span>:::タイマー:::</span></div>
+    <div class="kc-header-transparent kc-panel-header kc-timer-header" id="kc-drag-timer">
+      <span class="kc-timer-header-icon" aria-hidden="true">◷</span>
+      <span class="kc-timer-header-title">TIMER</span>
+      <span class="kc-timer-status" id="kc-disp-status">疲労抜き中</span>
+    </div>
     <div class="kc-timer-content" id="kc-timer-content">
-      <div class="kc-timer-status" id="kc-disp-status">疲労抜き中</div>
       <div class="kc-timer-stack" id="kc-timer-stack">
-        <div class="kc-end-time" id="kc-disp-end">--:--</div>
         <div class="kc-timer-val" id="kc-disp-countdown">00:00</div>
+        <div class="kc-end-time" id="kc-disp-end">--:--</div>
       </div>
     </div>
     <div class="kc-resize-handle-se" id="kc-resize-handle-timer"></div>
@@ -34,8 +37,11 @@ function createAreaWindow() {
   div.id = 'kc-win-area';
   div.className = 'kc-display-window';
   div.innerHTML = `
-    <div class="kc-region-body">
-      <div class="kc-header-transparent" id="kc-drag-area"><span>:::情報:::</span></div>
+    <div class="kc-region-body kc-panel-surface">
+      <div class="kc-header-transparent kc-panel-header" id="kc-drag-area">
+        <span class="kc-panel-header-icon" aria-hidden="true">◈</span>
+        <span class="kc-panel-header-title">INFORMATION</span>
+      </div>
       <div class="kc-area-content" id="kc-area-content"></div>
     </div>
     <div class="kc-resize-handle" id="kc-resize-handle-area"></div>
@@ -54,13 +60,15 @@ function createAreaWindow() {
 function createControlWindow() {
   const div = document.createElement('div');
   div.id = 'kc-win-control';
+  div.className = 'kc-panel-surface';
   div.innerHTML = `
-    <div class="kc-ctrl-header" id="kc-drag-ctrl">
-      <span>:::コントロールパネル:::</span>
+    <div class="kc-ctrl-header kc-panel-header" id="kc-drag-ctrl">
+      <span class="kc-panel-header-icon" aria-hidden="true">⌘</span>
+      <span class="kc-panel-header-title">CONTROL</span>
     </div>
     <div class="kc-ctrl-body kc-ctrl-body-start">
       <div class="kc-section kc-section-timer">
-        <div class="kc-label-side">タイマー設定</div>
+        <div class="kc-label-side"><span aria-hidden="true">◷</span><span>タイマー</span></div>
         <div class="kc-content-side">
           <div class="kc-input-row">
              <input type="text" class="kc-input kc-numpad-trigger kc-timer-input-manual" id="kc-timer-manual" placeholder="分">
@@ -81,7 +89,7 @@ function createControlWindow() {
         </div>
       </div>
       <div class="kc-section kc-section-map">
-        <div class="kc-label-side">海域情報設定</div>
+        <div class="kc-label-side"><span aria-hidden="true">◇</span><span>海域</span></div>
         <div class="kc-content-side">
         <div class="kc-setting-row kc-mb-1">
             <label class="kc-check-label"><input type="checkbox" id="kc-chk-event"> 限定(E)</label>
@@ -152,9 +160,9 @@ function updateTimerVisibility() {
   if (!el) return;
 
   if (currentTimerMode === 'auto') {
-    el.style.display = isTimerRunning ? 'block' : 'none';
+    el.style.display = isTimerRunning ? 'flex' : 'none';
   } else {
-    el.style.display = 'block';
+    el.style.display = 'flex';
   }
 }
 

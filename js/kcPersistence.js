@@ -84,6 +84,7 @@ function restoreWindowLayout() {
         if (saved.width) element.style.width = saved.width;
         if (saved.height) element.style.height = saved.height;
         if (saved.fontSize) element.style.setProperty('--kc-font-size', saved.fontSize);
+        if (saved.width && saved.height) element._requestTimerFit?.();
       }
     });
   } catch (error) {
