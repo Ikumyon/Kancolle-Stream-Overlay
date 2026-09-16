@@ -24,6 +24,12 @@ function applyStyles(input) {
   currentTimerPresets = settings.timerPresets;
   currentPortSupplyInterval = settings.portSupplyInterval;
   currentPortSupplyAmount = settings.portSupplyAmount;
+  currentCloudNotifyEnabled = settings.cloudNotifyEnabled;
+  currentCloudNotifyUrl = settings.cloudNotifyUrl;
+  currentCloudNotifyToken = settings.cloudNotifyToken;
+  if (typeof updateCloudTimerUI === 'function') {
+    updateCloudTimerUI();
+  }
 
   updateTimerVisibility();
   updateWindowStatus('kc-win-timer', true, settings.timerFrame);

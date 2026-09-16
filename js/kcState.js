@@ -30,6 +30,8 @@ let currentTimerNotify = false;
 let isTimerRunning = false;
 let timerInterval = null; // タイマーID
 
+
+
 // 母港給糧艦システム (PortSupply)
 let currentPortSupplyOn = false;
 let currentPortSupplyInterval = 15;
@@ -42,7 +44,12 @@ let currentMapMinor = "";
 let currentDifficulty = "none";
 let currentStatus = "none";
 
+// Cloudflare連携 (kancolle-notify)
+let currentCloudNotifyEnabled = false;
+let currentCloudNotifyUrl = "";
+let currentCloudNotifyToken = "";
+let currentSelectedCloudTimer = null; // 現在選択・表示中のタイマー情報 { id, kind, name, endAt, requestId }
+
 // UI制御用
 let activeInputId = null;
 let currentNumpadEnabled = true;
-

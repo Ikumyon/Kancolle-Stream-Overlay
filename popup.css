@@ -270,7 +270,7 @@ textarea:focus-visible,
 .field input,
 .field textarea,
 .input-with-unit input,
-#val-scrollSpeed {
+.range-value-input {
   width: 100%;
   min-width: 0;
   border: 1px solid var(--ui-border);
@@ -292,7 +292,7 @@ textarea:focus-visible,
 .field textarea:focus,
 .input-with-unit input:focus,
 .preset-input:focus,
-#val-scrollSpeed:focus {
+.range-value-input:focus {
   border-color: var(--ui-primary);
   box-shadow: 0 0 0 3px var(--ui-primary-soft);
   outline: none;

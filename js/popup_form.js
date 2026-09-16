@@ -32,6 +32,9 @@
       bgmScrollMode: selected('bgmScrollMode'),
       bgmEnabled: byId('kc-chk-bgm').checked,
       timerPresets: ['pre1', 'pre2', 'pre3', 'pre4'].map((id) => byId(id).value || null),
+      cloudNotifyEnabled: byId('cloudNotifyEnabled').checked,
+      cloudNotifyUrl: byId('cloudNotifyUrl').value,
+      cloudNotifyToken: byId('cloudNotifyToken').value,
       layoutConfig
     });
   }
@@ -72,6 +75,9 @@
     settings.timerPresets.forEach((preset, index) => {
       byId(`pre${index + 1}`).value = preset ?? '';
     });
+    byId('cloudNotifyEnabled').checked = settings.cloudNotifyEnabled;
+    byId('cloudNotifyUrl').value = settings.cloudNotifyUrl;
+    byId('cloudNotifyToken').value = settings.cloudNotifyToken;
     updateLabels();
   }
 

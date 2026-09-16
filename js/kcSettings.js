@@ -37,7 +37,10 @@
     customList: '',
     timerPresets: [10, 20, 30, null],
     portSupplyInterval: 15,
-    portSupplyAmount: 2
+    portSupplyAmount: 2,
+    cloudNotifyEnabled: false,
+    cloudNotifyUrl: '',
+    cloudNotifyToken: ''
   };
 
   function clone(value) {
@@ -141,7 +144,10 @@
       customList: stringValue(source.customList, defaults.customList),
       timerPresets: normalizePresets(source.timerPresets),
       portSupplyInterval: numberInRange(source.portSupplyInterval, defaults.portSupplyInterval, 1, 60),
-      portSupplyAmount: numberInRange(source.portSupplyAmount, defaults.portSupplyAmount, 1, 54)
+      portSupplyAmount: numberInRange(source.portSupplyAmount, defaults.portSupplyAmount, 1, 54),
+      cloudNotifyEnabled: booleanValue(source.cloudNotifyEnabled, defaults.cloudNotifyEnabled),
+      cloudNotifyUrl: stringValue(source.cloudNotifyUrl, defaults.cloudNotifyUrl).trim().replace(/\/+$/, ''),
+      cloudNotifyToken: stringValue(source.cloudNotifyToken, defaults.cloudNotifyToken).trim()
     };
   }
 

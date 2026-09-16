@@ -86,6 +86,27 @@
           <span class="switch"><input type="checkbox" id="timerNotify"><span aria-hidden="true"></span></span>
         </label>
       </section>
+
+      <section class="settings-card">
+        <div class="settings-card-header">
+          <span class="card-heading-icon" aria-hidden="true">☁</span>
+          <div><h3>Cloudflare連携 (kancolle-notify)</h3><p>タイマー終了時間をクラウドに送り、遠征・入渠タイマーを引き継ぎます。</p></div>
+        </div>
+        <label class="setting-row setting-row-clickable" for="cloudNotifyEnabled">
+          <div><strong>クラウド連携</strong><small>Cloudflare Workers と同期</small></div>
+          <span class="switch"><input type="checkbox" id="cloudNotifyEnabled"><span aria-hidden="true"></span></span>
+        </label>
+        <div class="field-grid single-column">
+          <label class="field">
+            <span>Worker URL</span>
+            <input type="url" id="cloudNotifyUrl" placeholder="https://kancolle-notify.your-subdomain.workers.dev">
+          </label>
+          <label class="field">
+            <span>認証トークン (Bearer Token)</span>
+            <input type="password" id="cloudNotifyToken" placeholder="トークンを入力">
+          </label>
+        </div>
+      </section>
     </section>
 
     <section id="tab-info" class="content-area" role="tabpanel" hidden>

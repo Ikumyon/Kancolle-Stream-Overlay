@@ -75,7 +75,15 @@ function createControlWindow() {
              <button class="kc-btn kc-timer-btn" id="kc-btn-manual-set">設定</button>
              <button class="kc-btn kc-btn-red kc-timer-btn-stop" id="kc-btn-stop">停止</button>
           </div>
-          <div class="kc-btn-row" id="kc-timer-presets-row"></div>
+          <div class="kc-mid-row">
+            <div class="kc-btn-row" id="kc-timer-presets-row"></div>
+            <div class="kc-cloud-select-wrap" id="kc-cloud-select-wrap" style="display: none;">
+              <span class="kc-cloud-icon-badge" id="kc-cloud-icon-badge" aria-hidden="true">☁</span>
+              <select id="kc-select-cloud-timer" class="kc-cloud-select-overlay" title="Cloudflareタイマー一覧">
+                <option value="">(ローカル)</option>
+              </select>
+            </div>
+          </div>
           <div class="kc-cond-row">
             <label class="kc-check-label kc-cond-port-supply">
               給<input type="checkbox" id="kc-chk-port-supply">
