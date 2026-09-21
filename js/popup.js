@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupRangeValueSync();
   setupFormFeedback();
   setupRecoveryPreview();
+  probeSenkaReader();
 
   KcSettings.load((settings) => {
     KcPopupForm.apply(settings);
@@ -171,6 +172,25 @@ function updateBgmState() {
   status.lastElementChild.textContent = enabled
     ? '保存後、BGMデータへの接続を開始します'
     : 'BGM連動は無効です';
+}
+
+function probeSenkaReader() {
+  const status = document.getElementById('senkaConnectionStatus');
+  if (!status || !globalThis.chrome?.management) return;
+  const setStatus = (state, label) => {
+    status.dataset.state = state;
+    status.lastElementChild.textContent = label;
+  };
+  setStatus('checking', '戦果リーダーを確認中…');
+  chrome.management.getAll((extensions) => {
+    const reader = extensions.find(extension => extension.type === 'extension'
+      && extension.name === 'KCO 通常戦果リーダー');
+    if (reader?.enabled) {
+      setStatus('enabled', 'KCO 通常戦果リーダーと連携済みです。');
+      return;
+    }
+    setStatus('missing', '戦果表示には KCO 通常戦果リーダー拡張機能が必要です。読み込んで有効にしてください。');
+  });
 }
 
 function updateDesignPreview() {

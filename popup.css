@@ -958,6 +958,15 @@ fieldset.field {
   border-color: rgba(80, 216, 144, 0.28);
 }
 
+.connection-status[data-state="missing"] {
+  color: var(--ui-warning);
+  border-color: rgba(255, 196, 87, 0.32);
+}
+
+.connection-status[data-state="missing"] .status-dot {
+  background: var(--ui-warning);
+}
+
 /* パネル管理 */
 .panel-list {
   display: grid;

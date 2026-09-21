@@ -1551,7 +1551,7 @@
   min-width: 0;
 }
 
-.kc-cloud-select-wrap {
+.kc-cloud-wrap {
   position: relative;
   flex: 0 0 24px;
   width: 24px;
@@ -1562,25 +1562,26 @@
   justify-content: center;
 }
 
-.kc-cloud-icon-badge {
+.kc-cloud-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
+  padding: 0;
   font-size: 13px;
   line-height: 1;
   background: rgba(14, 116, 164, 0.35);
   color: #67d8ff;
   border: 1px solid rgba(125, 211, 252, 0.3);
   border-radius: 4px;
-  pointer-events: none;
+  cursor: pointer;
   transition: all 0.2s;
   text-shadow: 0 0 6px rgba(79, 209, 255, 0.5);
   box-sizing: border-box;
 }
 
-.kc-cloud-select-wrap:hover .kc-cloud-icon-badge {
+.kc-cloud-btn:hover {
   background: rgba(14, 116, 164, 0.65);
   border-color: rgba(79, 209, 255, 0.8);
   color: #ffffff;
@@ -1588,33 +1589,95 @@
   box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
 }
 
-.kc-cloud-icon-badge.active {
+.kc-cloud-btn.active {
   background: rgba(14, 116, 164, 0.7);
   border-color: rgba(79, 209, 255, 0.9);
   color: #ffffff;
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
 }
 
-.kc-cloud-icon-badge.loading {
+.kc-cloud-btn.loading {
   animation: kc-cloud-pulse 0.8s infinite alternate;
 }
 
-.kc-cloud-select-overlay {
+.kc-cloud-menu {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  z-index: 2;
-  margin: 0;
-  padding: 0;
-  border: none;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 180px;
+  max-width: 240px;
+  max-height: 180px;
+  overflow-y: auto;
+  background: rgba(10, 22, 38, 0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 10px rgba(56, 189, 248, 0.25);
+  z-index: 1000;
+  padding: 4px;
+  box-sizing: border-box;
 }
 
-.kc-cloud-select-overlay option {
-  background: #0a192d;
-  color: #fff;
+.kc-cloud-menu::-webkit-scrollbar {
+  width: 4px;
+}
+.kc-cloud-menu::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+.kc-cloud-menu::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.4);
+  border-radius: 2px;
+}
+
+.kc-cloud-menu-status {
+  padding: 8px 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #94a3b8;
+  text-align: center;
+  user-select: none;
+  word-break: break-all;
+  white-space: normal;
+}
+
+.kc-cloud-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kc-cloud-menu-item {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  text-align: left;
+  background: rgba(15, 23, 42, 0.7);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: inherit;
+  line-height: 1.3;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.kc-cloud-menu-item:hover {
+  background: rgba(14, 116, 164, 0.55);
+  border-color: rgba(56, 189, 248, 0.7);
+  color: #ffffff;
+  transform: translateX(1px);
+}
+
+.kc-cloud-menu-item.active {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  background: rgba(14, 116, 164, 0.3);
 }
 
 @keyframes kc-cloud-pulse {

@@ -1,5 +1,5 @@
 // kcMedia.js
-// バックグラウンドが受信したBGM・戦果情報を表示状態へ反映する。
+// バックグラウンドが受信したBGM情報、および外部プラグインから受信した戦果情報を表示状態へ反映する。
 
 (function initializeMedia(global) {
   let started = false;
@@ -13,14 +13,25 @@
       currentBgm = data.title;
       needsRender = true;
     }
-    if (data.senka !== undefined) {
-      const nextSenka = String(data.senka);
-      if (currentSenka !== nextSenka) {
-        currentSenka = nextSenka;
-        needsRender = true;
-      }
-    }
     if (needsRender) renderInfoDisplay();
+  }
+
+  function handleSenkaEvent(event) {
+    if (!event || !event.detail) return;
+    const nextSenka = event.detail.senka !== undefined ? String(event.detail.senka) : null;
+    if (nextSenka !== null && currentSenka !== nextSenka) {
+      currentSenka = nextSenka;
+      renderInfoDisplay();
+    }
+  }
+
+  function handleSenkaMessage(event) {
+    if (event.source !== global || event.origin !== global.location.origin) return;
+    const message = event.data;
+    if (message?.source !== 'kco-senka-reader' || message.type !== 'snapshot' || message.version !== 1) return;
+    if (!Number.isFinite(message.senka) || message.senka < 0) return;
+    // 受信したページの文字列やHTMLを挿入せず、検証済み数値から表示を組み立てる。
+    handleSenkaEvent({ detail: { senka: message.senka.toFixed(2) } });
   }
 
   function setEnabled(enabled) {
@@ -53,6 +64,10 @@
       lastNowPlaying = changes.nowplaying.newValue || null;
       applyNowPlaying(lastNowPlaying);
     });
+
+    global.addEventListener('kco:update-senka', handleSenkaEvent);
+    global.addEventListener('message', handleSenkaMessage);
+    global.postMessage({ source: 'kco-overlay', type: 'senka-ready' }, global.location.origin);
   }
 
   global.KcMedia = Object.freeze({ start, setEnabled });

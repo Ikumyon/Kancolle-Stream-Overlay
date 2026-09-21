@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "test:senka": "node --test KCO_senka_reader/core.test.js KCO_senka_reader/integration.test.js",
     "check": "node --check js/kcSettings.js && node --check js/kcUtils.js && node --check js/kcState.js && node --check js/kcPersistence.js && node --check js/kcLayoutView.js && node --check js/kcCardView.js && node --check js/kcView.js && node --check js/kcMedia.js && node --check js/kcTimer.js && node --check js/kcSettingsController.js && node --check js/kcLogic.js && node --check js/kcEntry.js && node --check js/background.js && node --check js/popup_form.js && node --check js/popup_layout_model.js && node --check js/popup_layout_editor.js && node --check js/popup.js",
     "test": "node --test tests/settings.test.js tests/timer.test.js tests/structure.test.js",
     "verify": "npm run check && npm test"

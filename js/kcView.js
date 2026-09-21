@@ -77,11 +77,12 @@ function createControlWindow() {
           </div>
           <div class="kc-mid-row">
             <div class="kc-btn-row" id="kc-timer-presets-row"></div>
-            <div class="kc-cloud-select-wrap" id="kc-cloud-select-wrap" style="display: none;">
-              <span class="kc-cloud-icon-badge" id="kc-cloud-icon-badge" aria-hidden="true">☁</span>
-              <select id="kc-select-cloud-timer" class="kc-cloud-select-overlay" title="Cloudflareタイマー一覧">
-                <option value="">(ローカル)</option>
-              </select>
+            <div class="kc-cloud-wrap" id="kc-cloud-wrap" style="display: none;">
+              <button type="button" class="kc-btn kc-cloud-btn" id="kc-btn-cloud" title="クラウドタイマー一覧">☁</button>
+              <div class="kc-cloud-menu" id="kc-cloud-menu" style="display: none;">
+                <div class="kc-cloud-menu-status" id="kc-cloud-menu-status">取得中...</div>
+                <div class="kc-cloud-menu-list" id="kc-cloud-menu-list"></div>
+              </div>
             </div>
           </div>
           <div class="kc-cond-row">

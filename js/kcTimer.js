@@ -30,38 +30,115 @@
     let cachedCloudTimers = [];
 
     async function cloudRequest(path, options = {}) {
-      if (!currentCloudNotifyEnabled || !currentCloudNotifyUrl) return null;
-      const url = `${currentCloudNotifyUrl}${path}`;
+      if (!currentCloudNotifyEnabled) return { ok: false, error: 'クラウド連携が無効' };
+      if (!currentCloudNotifyUrl) return { ok: false, error: 'URL未設定' };
+
+      const cleanUrl = currentCloudNotifyUrl.trim().replace(/\/+$/, '');
+      const url = `${cleanUrl}${path}`;
       const headers = { 'Content-Type': 'application/json' };
       if (currentCloudNotifyToken) {
-        headers['Authorization'] = `Bearer ${currentCloudNotifyToken}`;
+        headers['Authorization'] = `Bearer ${currentCloudNotifyToken.trim()}`;
       }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
       try {
-        const res = await fetch(url, { ...options, headers: { ...headers, ...options.headers } });
-        if (!res.ok) {
-          console.warn('[KCO-Cloud] HTTP Error:', res.status, res.statusText);
-          return null;
+        const fetchOptions = {
+          method: options.method || 'GET',
+          headers: { ...headers, ...options.headers },
+          signal: controller.signal
+        };
+        if (options.body && ['POST', 'PUT', 'PATCH'].includes(fetchOptions.method)) {
+          fetchOptions.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
         }
-        return await res.json();
+
+        const res = await fetch(url, fetchOptions);
+        clearTimeout(timeoutId);
+        if (!res.ok) {
+          if (res.status === 401) {
+            return { ok: false, status: 401, error: '認証エラー (HTTP 401: トークン確認)' };
+          }
+          if (res.status === 404) {
+            return { ok: false, status: 404, error: '未検出 (HTTP 404: URL確認)' };
+          }
+          return { ok: false, status: res.status, error: `HTTP ${res.status} (${res.statusText || 'エラー'})` };
+        }
+        const data = await res.json();
+        return { ok: true, data };
       } catch (err) {
-        console.warn('[KCO-Cloud] Request failed:', err);
-        return null;
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          return { ok: false, error: 'タイムアウト (6秒)' };
+        }
+        return { ok: false, error: `通信エラー (${err.message || '接続失敗'})` };
       }
     }
 
-    function getTimerLabel(t) {
-      const remainingSec = Math.max(0, Math.ceil((t.endAt - Date.now()) / 1000));
-      const m = Math.floor(remainingSec / 60);
-      const s = (remainingSec % 60).toString().padStart(2, '0');
-      const timeStr = m >= 60 ? `${Math.floor(m / 60)}h${m % 60}m` : `${m}:${s}`;
+    let cloudMenuInterval = null;
 
-      if (t.kind === 'expedition') return `[遠征] ${t.name || '第' + (t.slot || '') + '艦隊'} (${timeStr})`;
-      if (t.kind === 'repair') return `[入渠] ${t.name || '第' + (t.slot || '') + 'ドック'} (${timeStr})`;
-      if (t.kind === 'akashi') return `[泊地] ${t.name || '泊地修理'} (${timeStr})`;
-      if (t.kind === 'build') return `[建造] ${t.name || '建造'} (${timeStr})`;
-      if (t.kind === 'fatigue') return `[疲労] ${t.name || '疲労回復'} (${timeStr})`;
-      if (t.kind === 'manual') return `[手動] ${t.name || 'タイマー'} (${timeStr})`;
-      return `[他] ${t.name || 'タイマー'} (${timeStr})`;
+    function stopCloudMenuTimer() {
+      if (cloudMenuInterval) {
+        clearInterval(cloudMenuInterval);
+        cloudMenuInterval = null;
+      }
+    }
+
+    function updateCloudMenuTimes() {
+      if (!menuList) return;
+      const items = menuList.querySelectorAll('.kc-cloud-menu-item');
+      items.forEach(btn => {
+        if (btn._timerData) {
+          const label = getTimerLabel(btn._timerData);
+          btn.textContent = label;
+          btn.title = label;
+        }
+      });
+    }
+
+    function getTimerLabel(t) {
+      const targetTime = Number.isSafeInteger(t.notifyAt) ? t.notifyAt : t.endAt;
+      const remainingSec = Math.max(0, Math.ceil((targetTime - Date.now()) / 1000));
+
+      const endD = new Date(targetTime);
+      const hours = endD.getHours().toString().padStart(2, '0');
+      const mins = endD.getMinutes().toString().padStart(2, '0');
+      const endTimeStr = `${hours}:${mins}`;
+
+      let remainingStr = '';
+      if (remainingSec >= 3600) {
+        const h = Math.floor(remainingSec / 3600);
+        const m = Math.floor((remainingSec % 3600) / 60);
+        remainingStr = `残り${h}時間${m}分`;
+      } else {
+        const m = Math.floor(remainingSec / 60);
+        const s = remainingSec % 60;
+        remainingStr = `残り${m}分${s}秒`;
+      }
+
+      let kindPrefix = '[他]';
+      let nameStr = t.name || 'タイマー';
+      if (t.kind === 'expedition') {
+        kindPrefix = '[遠征]';
+        nameStr = t.name || ('第' + (t.slot || '') + '艦隊');
+      } else if (t.kind === 'repair') {
+        kindPrefix = '[入渠]';
+        nameStr = t.name || ('第' + (t.slot || '') + 'ドック');
+      } else if (t.kind === 'akashi') {
+        kindPrefix = '[泊地]';
+        nameStr = t.name || '泊地修理';
+      } else if (t.kind === 'build') {
+        kindPrefix = '[建造]';
+        nameStr = t.name || '建造';
+      } else if (t.kind === 'fatigue') {
+        kindPrefix = '[疲労]';
+        nameStr = t.name || '疲労回復';
+      } else if (t.kind === 'manual') {
+        kindPrefix = '[指定]';
+        nameStr = t.name || 'タイマー';
+      }
+
+      return `${kindPrefix} ${nameStr} ${endTimeStr} (${remainingStr})`;
     }
 
     function getTimerTitle(t) {
@@ -73,61 +150,123 @@
       return t.name || '疲労抜き中';
     }
 
-    async function fetchCloudTimers(selectRequestId = null) {
-      if (!currentCloudNotifyEnabled || !currentCloudNotifyUrl) return;
-      const badge = document.getElementById('kc-cloud-icon-badge');
-      if (badge) badge.classList.add('loading');
+    const cloudBtn = document.getElementById('kc-btn-cloud');
+    const cloudMenu = document.getElementById('kc-cloud-menu');
+    const menuStatus = document.getElementById('kc-cloud-menu-status');
+    const menuList = document.getElementById('kc-cloud-menu-list');
 
-      try {
-        const data = await cloudRequest('/api/status');
-        if (!data || !Array.isArray(data.timers)) return;
+    function closeCloudMenu() {
+      stopCloudMenuTimer();
+      if (cloudMenu) cloudMenu.style.display = 'none';
+    }
 
-        const now = Date.now();
-        cachedCloudTimers = data.timers.filter(t => t.state === 'active' && Number.isSafeInteger(t.endAt) && t.endAt > now);
-        cachedCloudTimers.sort((a, b) => a.endAt - b.endAt);
-
-        const select = document.getElementById('kc-select-cloud-timer');
-        if (!select) return;
-
-        const previousValue = select.value;
-        select.replaceChildren();
-
-        const defaultOpt = document.createElement('option');
-        defaultOpt.value = '';
-        defaultOpt.textContent = '(ローカル / 解除)';
-        select.appendChild(defaultOpt);
-
-        cachedCloudTimers.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t.id;
-          opt.textContent = getTimerLabel(t);
-          select.appendChild(opt);
-        });
-
-        if (selectRequestId) {
-          const targetId = 'manual:' + selectRequestId;
-          const found = cachedCloudTimers.find(t => t.id === targetId);
-          if (found) {
-            select.value = targetId;
-          }
-        } else if (previousValue && cachedCloudTimers.some(t => t.id === previousValue)) {
-          select.value = previousValue;
-        }
-
-        if (badge) badge.classList.toggle('active', !!currentSelectedCloudTimer || !!select.value);
-      } finally {
-        if (badge) badge.classList.remove('loading');
+    function updateCloudBtnState() {
+      if (cloudBtn) {
+        cloudBtn.classList.toggle('active', !!currentSelectedCloudTimer);
       }
     }
 
+    async function handleCloudBtnClick(e) {
+      e.stopPropagation();
+      if (!cloudMenu || !cloudBtn) return;
+
+      if (cloudMenu.style.display === 'block') {
+        closeCloudMenu();
+        return;
+      }
+
+      stopCloudMenuTimer();
+      cloudMenu.style.display = 'block';
+      if (menuStatus) {
+        menuStatus.style.display = 'block';
+        menuStatus.textContent = '取得中...';
+      }
+      if (menuList) menuList.replaceChildren();
+      cloudBtn.classList.add('loading');
+
+      try {
+        const result = await cloudRequest('/api/status');
+        cloudBtn.classList.remove('loading');
+
+        if (!result.ok) {
+          if (menuStatus) menuStatus.textContent = result.error || '取得失敗';
+          return;
+        }
+
+        const data = result.data;
+        if (!data || !Array.isArray(data.timers)) {
+          if (menuStatus) menuStatus.textContent = 'データ形式不正';
+          return;
+        }
+
+        const now = Date.now();
+        cachedCloudTimers = data.timers.filter(t => {
+          const target = Number.isSafeInteger(t.notifyAt) ? t.notifyAt : t.endAt;
+          return t.state === 'active' && Number.isSafeInteger(target) && target > now;
+        });
+        cachedCloudTimers.sort((a, b) => {
+          const targetA = Number.isSafeInteger(a.notifyAt) ? a.notifyAt : a.endAt;
+          const targetB = Number.isSafeInteger(b.notifyAt) ? b.notifyAt : b.endAt;
+          return targetA - targetB;
+        });
+
+        if (cachedCloudTimers.length === 0) {
+          if (menuStatus) menuStatus.textContent = 'タイマーなし';
+          return;
+        }
+
+        if (menuStatus) menuStatus.style.display = 'none';
+        if (menuList) {
+          menuList.replaceChildren();
+          cachedCloudTimers.forEach(t => {
+            const itemBtn = document.createElement('button');
+            itemBtn.type = 'button';
+            itemBtn.className = 'kc-cloud-menu-item';
+            itemBtn._timerData = t;
+            if (currentSelectedCloudTimer && currentSelectedCloudTimer.id === t.id) {
+              itemBtn.classList.add('active');
+            }
+            const label = getTimerLabel(t);
+            itemBtn.textContent = label;
+            itemBtn.title = label;
+
+            itemBtn.onclick = (ev) => {
+              ev.stopPropagation();
+              currentSelectedCloudTimer = t;
+              if (t.kind === 'manual' && !t.requestId && t.id.startsWith('manual:')) {
+                currentSelectedCloudTimer.requestId = t.id.replace('manual:', '');
+              }
+              const targetTime = Number.isSafeInteger(t.notifyAt) ? t.notifyAt : t.endAt;
+              const endTime = new Date(targetTime);
+              const title = getTimerTitle(t);
+              const completeMsg = t.kind === 'fatigue' || t.kind === 'manual' ? '回復完了' : '完了';
+              startTimerWithEndTime(endTime, title, completeMsg);
+              updateCloudBtnState();
+              closeCloudMenu();
+            };
+
+            menuList.appendChild(itemBtn);
+          });
+
+          stopCloudMenuTimer();
+          cloudMenuInterval = setInterval(updateCloudMenuTimes, 1000);
+        }
+      } catch (err) {
+        console.warn('[KCO-Cloud] Menu fetch error:', err);
+        cloudBtn.classList.remove('loading');
+        if (menuStatus) menuStatus.textContent = `例外エラー (${err.message || '不明'})`;
+      }
+    }
+
+
     function updateCloudTimerUI() {
-      const wrap = document.getElementById('kc-cloud-select-wrap');
+      const wrap = document.getElementById('kc-cloud-wrap');
       if (!wrap) return;
       if (currentCloudNotifyEnabled && currentCloudNotifyUrl) {
         wrap.style.display = 'inline-flex';
-        fetchCloudTimers();
       } else {
         wrap.style.display = 'none';
+        closeCloudMenu();
       }
     }
     global.updateCloudTimerUI = updateCloudTimerUI;
@@ -164,10 +303,7 @@
           endDisplay.textContent = completeText;
           timerWindow.classList.add('kc-timer-complete');
           currentSelectedCloudTimer = null;
-          const select = document.getElementById('kc-select-cloud-timer');
-          if (select) select.value = '';
-          const badge = document.getElementById('kc-cloud-icon-badge');
-          if (badge) badge.classList.remove('active');
+          updateCloudBtnState();
           return;
         }
 
@@ -214,11 +350,11 @@
         cloudRequest('/api/manual', {
           method: 'POST',
           body: JSON.stringify({ requestId, name: label, endAt })
-        }).then(() => {
-          fetchCloudTimers(requestId);
         });
+        updateCloudBtnState();
       } else {
         currentSelectedCloudTimer = null;
+        updateCloudBtnState();
       }
     };
 
@@ -232,17 +368,13 @@
       // 停止時の分岐: 手動タイマーなら Cloudflare も削除、遠征・入渠ならローカル表示解除のみ
       if (currentSelectedCloudTimer) {
         if (currentSelectedCloudTimer.kind === 'manual' && currentSelectedCloudTimer.requestId) {
-          cloudRequest('/api/manual/' + currentSelectedCloudTimer.requestId, { method: 'DELETE' }).then(() => {
-            fetchCloudTimers();
-          });
+          cloudRequest('/api/manual/' + currentSelectedCloudTimer.requestId, { method: 'DELETE' });
         }
         currentSelectedCloudTimer = null;
       }
 
-      const select = document.getElementById('kc-select-cloud-timer');
-      if (select) select.value = '';
-      const badge = document.getElementById('kc-cloud-icon-badge');
-      if (badge) badge.classList.remove('active');
+      updateCloudBtnState();
+      closeCloudMenu();
     };
 
     document.getElementById('kc-btn-manual-set').onclick = () => {
@@ -260,47 +392,16 @@
       if (minutes > 0) startTimerFunc(minutes, '疲労回復');
     };
 
-    const cloudSelect = document.getElementById('kc-select-cloud-timer');
-    if (cloudSelect) {
-      // 押した（クリック/タップした）瞬間に Cloudflare から最新一覧をリクエスト
-      const requestCloudTimersOnInteraction = () => {
-        fetchCloudTimers();
-      };
-      cloudSelect.onmousedown = requestCloudTimersOnInteraction;
-      cloudSelect.ontouchstart = requestCloudTimersOnInteraction;
-      cloudSelect.onfocus = () => {
-        if (!cachedCloudTimers.length) fetchCloudTimers();
-      };
-
-      cloudSelect.onchange = () => {
-        const badge = document.getElementById('kc-cloud-icon-badge');
-        const selectedId = cloudSelect.value;
-        if (!selectedId) {
-          // ローカルに戻す（表示解除）
-          clearInterval(timerInterval);
-          timerInterval = null;
-          isTimerRunning = false;
-          updateTimerVisibility();
-          resetDisplay();
-          currentSelectedCloudTimer = null;
-          if (badge) badge.classList.remove('active');
-          return;
-        }
-
-        const timer = cachedCloudTimers.find(t => t.id === selectedId);
-        if (timer) {
-          currentSelectedCloudTimer = timer;
-          if (timer.kind === 'manual' && !timer.requestId && timer.id.startsWith('manual:')) {
-            currentSelectedCloudTimer.requestId = timer.id.replace('manual:', '');
-          }
-          const endTime = new Date(timer.endAt);
-          const title = getTimerTitle(timer);
-          const completeMsg = timer.kind === 'fatigue' || timer.kind === 'manual' ? '回復完了' : '完了';
-          startTimerWithEndTime(endTime, title, completeMsg);
-          if (badge) badge.classList.add('active');
-        }
-      };
+    if (cloudBtn) {
+      cloudBtn.onclick = handleCloudBtnClick;
     }
+
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('kc-cloud-wrap');
+      if (wrap && !wrap.contains(e.target)) {
+        closeCloudMenu();
+      }
+    });
 
     // 初回初期化
     updateCloudTimerUI();
